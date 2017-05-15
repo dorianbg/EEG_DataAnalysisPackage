@@ -38,9 +38,9 @@ public class HadoopLoadingTest {
              - 4. number of channels
             */
             if (args.length <= 3 || args.length >= 5) {
-                hdfsvhdrFileLocation = "/user/digitalAssistanceSystem/data/numbers/KVary/KArlovyVary_20150507_04.vhdr";
-                hdfsEEGFileLocation = "/user/digitalAssistanceSystem/data/numbers/KVary/KArlovyVary_20150507_04.eeg";
-                outputFileLocation = "/user/digitalAssistanceSystem/processed_KArlovyVary_20150507";
+                hdfsvhdrFileLocation = "/user/digitalAssistanceSystem/Datasets/University_Hospital_Pilsen/2_2_2017/male_2_11_1960_respiration_failure/ARO_2_2_instruction_nosound_01.vhdr";
+                hdfsEEGFileLocation = "/user/digitalAssistanceSystem/Datasets/University_Hospital_Pilsen/2_2_2017/male_2_11_1960_respiration_failure/ARO_2_2_instruction_nosound_01.eeg";
+                outputFileLocation = "/user/digitalAssistanceSystem/University_Hospital_Pilsen";
                 channel = 3; // kinda the default value
             } else { // if (args.length == 4) -- ie this can only happen with 4 inputs
                 hdfsvhdrFileLocation = args[0];
