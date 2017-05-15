@@ -1,67 +1,36 @@
-import EEGLoader.signal.ChannelInfo;
-import EEGLoader.signal.DataTransformer;
-import EEGLoader.signal.EEGDataTransformer;
-import cz.zcu.kiv.eegdsp.common.ISignalProcessor;
-import cz.zcu.kiv.eegdsp.wavelet.discrete.WaveletTransformationDiscrete;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.*;
-import org.apache.hadoop.io.IOUtils;
-import org.apache.hadoop.util.Progressable;
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
-
-import java.io.*;
-import java.net.URI;
-import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static java.lang.System.out;
+import EEGLoader.HadoopLoadingTest;
 
 /**
- * Created by dbg on 07/05/2017.
+ * Created by Dorian Beganovic on 07/05/2017.
  */
 public class Main {
     public static void main(String[] args) {
-        //trySpark2();
-        tryRAWEEG(args);
+        HadoopLoadingTest.tryRAWEEG(args);
     }
+}
 
 
-    public static void tryRAWEEG(String[] args) {
-        try {
-            DataTransformer transformer = new EEGDataTransformer();
 
-            String hdfsvhdrFileLocation = "/user/digitalAssistanceSystem/data/numbers/KVary/KArlovyVary_20150507_04.vhdr";
-            String hdfsEEGFileLocation = "/user/digitalAssistanceSystem/data/numbers/KVary/KArlovyVary_20150507_04.eeg";
-            String outputFileLocation = "hdfs://localhost:8020/user/digitalAssistanceSystem/processed_KArlovyVary_20150507";
 
-            List<ChannelInfo> channels = transformer.getChannelInfo(args[0]);
-            //int channel = Integer.parseInt(args[args.length - 1]);
-            int channel = 3; // kinda the default value
-            double[] dataInValues;
-            dataInValues = transformer.readBinaryData(hdfsvhdrFileLocation, hdfsEEGFileLocation, channel, ByteOrder.LITTLE_ENDIAN);
 
-//68.4, 69.3, 73
 
-            SparkConf conf = new SparkConf().setMaster("local").setAppName("Work Count App");
-            // Create a Java version of the Spark Context from the configuration
-            JavaSparkContext sc = new JavaSparkContext(conf);
-            JavaRDD<double[]> rawVals = sc.parallelize(Arrays.asList(dataInValues));
-            rawVals.saveAsTextFile(args[args.length - 2]);
 
-            // write("/Users/dorianbeganovic/Desktop/hdfs2.txt",dataInValues);
 
-//            for (EEGMarker marker: list) {
-//                System.out.println(marker.getName() + " " + marker.getPosition());
-//            }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+
+
+
+
+
+
+
+
+
+/*
+below is only "throwaway" temp code
+ */
+
+
 
     /*
     public static void trySpark() {
@@ -160,6 +129,3 @@ public class Main {
     }
 
         */
-
-
-}

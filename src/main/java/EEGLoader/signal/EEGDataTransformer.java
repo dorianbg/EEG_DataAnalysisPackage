@@ -14,6 +14,14 @@ import java.util.List;
 public class EEGDataTransformer implements DataTransformer {
 
     private VhdrReader reader = new VhdrReader();
+
+    // this will be a copy of the hadoop filesystem that we can later re-use
+    private FileSystem fs;
+
+    public FileSystem getFs() {
+        return fs;
+    }
+
     /**
      * This method reads binary data and decodes double values.
      * This method expects data file and header file in binary form. It is not depend on data source.
@@ -105,7 +113,7 @@ public class EEGDataTransformer implements DataTransformer {
         */
         String uri = "hdfs://localhost:8020";
         Configuration conf = new Configuration();
-        FileSystem fs = FileSystem.get(URI.create(uri), conf);
+        this.fs = FileSystem.get(URI.create(uri), conf);
         FSDataInputStream data = fs.open(new Path(filename));
 
 
