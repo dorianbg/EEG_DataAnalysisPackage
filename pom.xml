@@ -6,7 +6,7 @@
 
     <groupId>spark_eeg</groupId>
     <artifactId>spark_eeg</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1</version>
     <build>
         <plugins>
             <plugin>
@@ -29,9 +29,22 @@
      <dependency>
         <groupId>org.apache.hadoop</groupId>
         <artifactId>hadoop-common</artifactId>
-        <version>2.7.2</version>
+        <version>2.6.0</version>
     </dependency>
-    <dependency>
+
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs</artifactId>
+            <version>2.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-client</artifactId>
+            <version>2.6.0</version>
+        </dependency>
+
+
+        <dependency>
         <groupId>cz.zcu.kiv</groupId>
         <artifactId>eegdsp</artifactId>
         <version>1.0</version>
