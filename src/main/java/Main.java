@@ -1,11 +1,9 @@
-import EEGLoader.test.HadoopLoadingTest;
-
 /**
  * Created by Dorian Beganovic on 07/05/2017.
  */
 public class Main {
     public static void main(String[] args) {
-        HadoopLoadingTest.tryRAWEEG(args);
+        System.out.println();
     }
 }
 
