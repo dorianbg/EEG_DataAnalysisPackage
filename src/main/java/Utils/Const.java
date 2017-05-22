@@ -1,5 +1,8 @@
 package Utils;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+
 import java.awt.Font;
 
 public class Const {
@@ -8,6 +11,15 @@ public class Const {
     public static final String VMRK_EXTENSION = ".vmrk";
     public static final String EEG_EXTENSION = ".eeg";
 
+
+    //-------------------------Hadoop HDFS Configuration---------------
+
+    public static final String HDFS_URI = "hdfs://localhost:8020";
+    public static final Configuration HDFS_CONF = new Configuration();
+
+    ///--- this might be a good idea to explore
+    public static final String HadoopUserPrefixFolder = "/user/digitalAssistanceSystem/";
+    public static final String Data_folder = "/data/numbers/";
 
     //-------------------------MLP classifier------------------------
     public static final int DEFAULT_OUTPUT_NEURONS = 1; /* number of output neurons */
@@ -51,4 +63,5 @@ public class Const {
 //         "data/numbers/DolniBela", "data/numbers/KVary", "data/numbers/SPSD", "data/numbers/Strasice2",
 //        "data/numbers/Tachov", "data/numbers/Tachov2", "data/numbers/ZSBolevecka"};
     public static final String[] DIRECTORIES = {"data/numbers"};
+
 }

@@ -1,4 +1,4 @@
-package EEGLoader.signal;
+package EEGLoader.source;
 
 
 import java.nio.ByteBuffer;

@@ -1,4 +1,4 @@
-package EEGLoader.signal;
+package EEGLoader.source;
 
 public class EEGMarker {
 

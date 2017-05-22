@@ -1,8 +1,7 @@
-package EEGLoader.signal;
+package EEGLoader.source;
 
 
-import EEGLoader.signal.DataTransformer;
-import org.apache.hadoop.conf.Configuration;
+import Utils.Const;
 import org.apache.hadoop.fs.*;
 
 import java.io.*;
@@ -17,10 +16,6 @@ public class EEGDataTransformer implements DataTransformer {
 
     // this will be a copy of the hadoop filesystem that we can later re-use
     private FileSystem fs;
-
-    public FileSystem getFs() {
-        return fs;
-    }
 
     /**
      * This method reads binary data and decodes double values.
@@ -107,15 +102,8 @@ public class EEGDataTransformer implements DataTransformer {
     }
 
     private byte[] fileToByteArray(String filename) throws IOException {
-        /*File file = new File(filename);
-        InputStream fileIS = new FileInputStream(file);
-        DataInputStream data = new FSDataInputStream(fileIS);
-        */
-        String uri = "hdfs://localhost:8020";
-        Configuration conf = new Configuration();
-        this.fs = FileSystem.get(URI.create(uri), conf);
+        this.fs = FileSystem.get(URI.create(Const.HDFS_URI), Const.HDFS_CONF);
         FSDataInputStream data = fs.open(new Path(filename));
-
 
         byte[] fileArray = new byte[(int) fs.getFileLinkStatus(new Path(filename)).getLen()];
         data.readFully(fileArray);

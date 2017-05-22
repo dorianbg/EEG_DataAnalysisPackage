@@ -1,4 +1,4 @@
-package EEGLoader.signal;
+package EEGLoader.source;
 
 /**
  * Created by stebjan on 10.8.2015.

@@ -1,21 +1,20 @@
-package EEGLoader;
+package EEGLoader.test;
 
-import EEGLoader.signal.DataTransformer;
-import EEGLoader.signal.EEGDataTransformer;
+import EEGLoader.source.DataTransformer;
+import EEGLoader.source.EEGDataTransformer;
+import Utils.Const;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.Function;
 
+import java.net.URI;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
- * Created by dbg on 15/05/2017.
+ * @author Dorian Beganovic
  */
 public class HadoopLoadingTest {
 
@@ -72,7 +71,7 @@ public class HadoopLoadingTest {
 
             // now write the output to FS
 
-            FileSystem fs = transformer.getFs();
+            FileSystem fs = FileSystem.get(URI.create(Const.HDFS_URI), Const.HDFS_CONF);
 
             if (fs.exists(new Path(outputFileLocation))){
                 fs.delete(new Path(outputFileLocation),true);

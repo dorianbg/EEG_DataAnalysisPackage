@@ -1,4 +1,4 @@
-import EEGLoader.HadoopLoadingTest;
+import EEGLoader.test.HadoopLoadingTest;
 
 /**
  * Created by Dorian Beganovic on 07/05/2017.

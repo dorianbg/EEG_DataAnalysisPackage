@@ -1,6 +1,4 @@
-package EEGLoader.signal;
-
-import org.apache.hadoop.fs.FileSystem;
+package EEGLoader.source;
 
 import java.io.IOException;
 import java.nio.ByteOrder;
@@ -88,14 +86,5 @@ public interface DataTransformer {
      */
     public List<ChannelInfo> getChannelInfo(String headerFile) throws IOException;
 
-
-    /**
-     * This method shares the Hadoop FileSystem configuration defined once
-     * with the whole project. It will act as a singleton (single source of truth)
-     *
-     * Only using the instance returned by this method you can write to hdfs or get the properties
-     * @return
-     */
-    public FileSystem getFs() ;
 
 }
