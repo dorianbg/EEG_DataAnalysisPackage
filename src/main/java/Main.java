@@ -1,5 +1,5 @@
 /**
- * Created by Dorian Beganovic on 07/05/2017.
+ * @author Dorian Beganovic
  */
 public class Main {
     public static void main(String[] args) {

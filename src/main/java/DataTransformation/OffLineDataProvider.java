@@ -1,14 +1,12 @@
-package OffLineDataProvider;
+package DataTransformation;
 
-import EEGLoader.ChannelInfo;
-import EEGLoader.DataTransformer;
-import EEGLoader.EEGDataTransformer;
-import EEGLoader.EEGMarker;
+import EEGDataLoading.ChannelInfo;
+import EEGDataLoading.DataTransformer;
+import EEGDataLoading.EEGDataTransformer;
+import EEGDataLoading.EEGMarker;
 import Utils.Baseline;
 import Utils.Const;
-import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 
 import java.io.BufferedReader;
@@ -19,7 +17,7 @@ import java.nio.ByteOrder;
 import java.util.*;
 
 /**
- * Created by Dorian Beganovic on 15/05/2017.
+ * @author Dorian Beganovic
  */
 public class OffLineDataProvider {
 
@@ -42,14 +40,77 @@ public class OffLineDataProvider {
     //
     private String filePrefix = "";
 
-
+    private String[] args;
+    /**
+     *
+     * @param args The arguments for the program in following format:
+     *  -> 1) < location of a .eeg file> < target number>  *< optional values>
+     *          - it will extract the .vhdr and .vmrk file
+     *          by substituting .eeg suffix with the appropriate
+     *  -> 2) < location of info.txt file>
+     *          - it will loop over all of the files and also store the guessed number
+     * @throws Exception in case the file does not exist
+     */
     public OffLineDataProvider(String[] args) throws Exception {
-        this.fs = FileSystem.get(URI.create(Const.HDFS_URI), Const.HDFS_CONF);
-        handleInput(args);
-        loadData();
+        this.args = args;
     }
 
-    private void loadData() throws Exception {
+    public void loadData()  {
+        try {
+            this.fs = FileSystem.get(URI.create(Const.HDFS_URI), Const.HDFS_CONF);
+            handleInput(args);
+            processEEGFiles();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Handles the inputted file location with this logic:
+     * - Required input:
+     *  -> 1) < location of a .eeg file> < target number>  *< optional values>
+     *          - it will extract the .vhdr and .vmrk file
+     *          by substituting .eeg suffix with the appropriate
+     *  -> 2) < location of info.txt file>
+     *          - it will loop over all of the files and also store the guessed number
+     * @param args the arguments provided at application startup
+     * @throws IOException if the directory doesn't contain the file, or the file does not exists
+     */
+    private void handleInput(String[] args) throws IOException {
+        if(args.length <= 0 || args.length > 6){
+            throw new IllegalArgumentException(
+                    "Please enter the input in one of these formats: " +
+                            "1. <location of info.txt file> " +
+                            "2. <location of a .eeg file> <target number>  *<optional values>");
+        }
+        else {
+            String fileLocation = args[0];
+            // .EEG
+            if (fileLocation.substring(fileLocation.length() - 4).equals(".eeg")){ // in this case we have a .eeg file
+                filePrefix = Const.HadoopUserPrefixFolder;
+                files.put(fileLocation,Integer.parseInt(args[1]));
+            }
+            // .TXT
+            else if(fileLocation.substring(fileLocation.length() - 4).equals(".txt")){
+                filePrefix = Const.HadoopUserPrefixFolder + Const.Data_folder;
+                loadFilesFromInfoTxt(fileLocation);
+            }
+            // DIRECTORY
+            else{
+                throw new IllegalArgumentException(
+                        "Please enter the input in one of these formats: " +
+                                "1. <location of info.txt file> " +
+                                "2. <location of a .eeg file> <target number>  *<optional values>");
+            }
+        }
+    }
+
+
+    /**
+     * helper function which processes the EEGFiles after
+     * @throws Exception in case a file does not exist
+     */
+    private void processEEGFiles() throws Exception {
 
         for (Map.Entry<String, Integer> fileEntry: files.entrySet()) {
 
@@ -101,9 +162,7 @@ public class OffLineDataProvider {
             //Collections.shuffle(markers);
 
             // store all epochs in a single list
-
             for (EEGMarker marker : markers) {
-                //System.out.println(marker);
 
                 // initiate the epoch object
                 EpochHolder epoch = new EpochHolder();
@@ -119,11 +178,11 @@ public class OffLineDataProvider {
 
                 try {
                     //2. set the values of signals for the epochs
-                    float[] ffzChannel = Utils.toFloatArray(Arrays.copyOfRange(fzChannel,
+                    float[] ffzChannel = DataProviderUtils.toFloatArray(Arrays.copyOfRange(fzChannel,
                             marker.getPosition() - Const.PREESTIMULUS_VALUES, marker.getPosition() + Const.POSTSTIMULUS_VALUES));
-                    float[] fczChannel = Utils.toFloatArray(Arrays.copyOfRange(czChannel,
+                    float[] fczChannel = DataProviderUtils.toFloatArray(Arrays.copyOfRange(czChannel,
                             marker.getPosition() - Const.PREESTIMULUS_VALUES, marker.getPosition() + Const.POSTSTIMULUS_VALUES));
-                    float[] fpzChannel = Utils.toFloatArray(Arrays.copyOfRange(pzChannel,
+                    float[] fpzChannel = DataProviderUtils.toFloatArray(Arrays.copyOfRange(pzChannel,
                             marker.getPosition() - Const.PREESTIMULUS_VALUES, marker.getPosition() + Const.POSTSTIMULUS_VALUES));
 
                     Baseline.correct(ffzChannel, Const.PREESTIMULUS_VALUES);
@@ -155,115 +214,78 @@ public class OffLineDataProvider {
                 } catch (ArrayIndexOutOfBoundsException ex) {
                     ex.printStackTrace();
                 }
-
-
             }
         }
+
     }
 
 
-    private void handleInput(String[] args) throws IOException {
-        if(args.length <= 0 || args.length > 6){
-            throw new IllegalArgumentException(
-                    "Please enter the input in one of these formats: " +
-                            "1. <location of info.txt file> " +
-                            "2. <location of a directory containing a .eeg file> <target number> *<optional values>" +
-                            "3. <location of a .eeg file> <target number>  *<optional values>");
-        }
-        else {
-            String fileLocation = args[0];
-            if (fileLocation.substring(fileLocation.length() - 4).equals(".eeg")){ // in this case we have a .eeg file
-                filePrefix = Const.HadoopUserPrefixFolder;
-                files.put(fileLocation,Integer.parseInt(args[1]));
-            }
-            else if(fileLocation.substring(fileLocation.length() - 4).equals(".txt")){
-                filePrefix = Const.HadoopUserPrefixFolder + Const.Data_folder;
-                files = loadExpectedFiles(fileLocation);
-            }
-            else{
-                filePrefix = Const.HadoopUserPrefixFolder;
-                files.put(fileLocation,Integer.parseInt(args[1]));
-            }
 
-        }
-
-
-    }
-
-    private Map<String, Integer> loadExpectedFiles(String fileLocation) throws IOException {
-        Map<String, Integer> res = new HashMap<>();
-
+    /**
+     * Handles the loading of info.txt files where the format is
+     * eg.
+     * "Stankov/Stankov_2014_01.egg 2
+     *  Stankov/Stankov_2014_02.egg 2
+     *  Stankov/Stankov_2014_03.egg 2"
+     *
+     * @param fileLocation the location of .txt file with above specified format
+     * @return Map with key=location of .eeg file, value = guessed number
+     * @throws IOException in case the .txt or one of specified .eeg file does not exist
+     */
+    private void loadFilesFromInfoTxt(String fileLocation) throws IOException {
+        // init a new reader for hadoop hdfs
         BufferedReader br=new BufferedReader(new InputStreamReader(fs.open(new Path(fileLocation))));
-        System.out.println(fileLocation);
+        //System.out.println(fileLocation);
         String line;
         int num;
         String fileLoc;
+        // read all lines
         while ((line = br.readLine()) != null) {
-            System.out.println(line);
+//            System.out.println(line);
+            // if the line is empty, ignore it
             if (line.length() == 0){
                 continue;
             }
-            if (line.charAt(0) == '#') { //comment in info txt
+            // if the line starts with #, ignore it
+            if (line.charAt(0) == '#') { //comment line in info txt
                 continue;
             }
+            // each line is expected to be <file location*.eeg > < guessed number> <Optional vals>
             String[] parts = line.split(" ");
             if (parts.length > 1) {
                 try {
-                    num = Integer.parseInt(parts[1]);
                     fileLoc  = parts[0];
-                    res.put(fileLoc, num);
+                    num = Integer.parseInt(parts[1]);
+                    // store in the map
+                    files.put(fileLoc, num);
                 } catch (NumberFormatException ex) {
-                    //NaN
+                    throw new IllegalArgumentException("Line " + line + " contains an improper number format");
                 }
             }
         }
-
         br.close();
-        return res;
-
     }
 
-
-    public List<double[][]> getTrainingData() {
-        return this.epochs;
-    }
-    public List<Double> getTrainingDataLabels(){
-        return this.targets;
-    }
-    /*
-    This will handle the users input in terms of the provided input
-    1) if given a folder, that there are .eeg and the related .vmrk and .vhdr files
-    2) if given a filename (must end with .eeg), that there are .vmrk and .vhdr files
+    /**
+     *
+     * @param dataLocation the file must be ending in .eeg format
+     * @throws IllegalArgumentException in case the algorithm was not found
+     * @throws IOException in case there was an IO issue
      */
     private void setFileNames(String dataLocation) throws IllegalArgumentException, IOException {
         if (dataLocation.length() <= 4) {
-            throw new IllegalArgumentException("Incorrect file name, must be atleast longer than 4 characters ") ;
+            throw new IllegalArgumentException("Incorrect file name, must be at least longer than 4 characters ") ;
         }
         else {
             String eegFileLocation = "";
             if (dataLocation.substring(dataLocation.length() - 4).equals(".eeg")){ // in this case we have a .eeg file
                 eegFileLocation = dataLocation;
             }
-            else if(dataLocation.substring(dataLocation.length() - 4).equals(".txt")){
-                // this case should never happen
-                throw new IllegalArgumentException("Incorrect file name") ;
-            }
             else { // here we assume a folder/directory is given and we have to find the .eeg file
-                FileStatus[] status = fs.listStatus(new Path(dataLocation));
-                Path[] listedPaths = FileUtil.stat2Paths(status);
-                // here we go over all the files in the directory and search for one ending in .eeg
-                for (Path p : listedPaths) {
-                    //System.out.println(p.toString());
-                    if(p.toString().substring(p.toString().length() - 4).equals(".eeg")){
-                        eegFileLocation = p.toString().replace(Const.HDFS_URI,"");
-                        break;
-                    }
-                }
-                // we just have to do a check that indeed we found an eeg file
                 if(eegFileLocation.length() <= 2){
                     throw new IllegalArgumentException("There is no .eeg file in the given directory");
                 }
-                // this will set the private fields for file names
+                throw new IllegalArgumentException("Invalid .eeg file");
             }
 
             // based on the .eeg file, change just the suffixes
@@ -290,6 +312,17 @@ public class OffLineDataProvider {
         }
     }
 
+    /**
+     * @return epochs for training
+     */
+    public List<double[][]> getTrainingData() {
+        return this.epochs;
+    }
 
-
+    /**
+     * @return data labels
+     */
+    public List<Double> getTrainingDataLabels(){
+        return this.targets;
+    }
 }

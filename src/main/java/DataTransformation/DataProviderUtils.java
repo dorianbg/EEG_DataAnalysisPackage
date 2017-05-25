@@ -1,11 +1,11 @@
-package OffLineDataProvider;
+package DataTransformation;
 
 import java.util.List;
 
 /**
  * @author Dorian Beganovic
  */
-public class Utils {
+public class DataProviderUtils {
     public static void writeEpochsToCSV(List<double[][]> epochs) throws Exception {
 
         //create a File class object and give the file the name employees.csv

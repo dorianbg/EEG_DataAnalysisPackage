@@ -1,4 +1,4 @@
-package EEGLoader;
+package EEGDataLoading;
 
 public class EEGMarker {
 

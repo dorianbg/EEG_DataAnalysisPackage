@@ -1,5 +1,5 @@
-import EEGLoader.DataTransformer;
-import EEGLoader.EEGDataTransformer;
+import EEGDataLoading.DataTransformer;
+import EEGDataLoading.EEGDataTransformer;
 import Utils.Const;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;

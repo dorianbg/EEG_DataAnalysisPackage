@@ -1,4 +1,4 @@
-package EEGLoader;
+package EEGDataLoading;
 
 import java.io.IOException;
 import java.nio.ByteOrder;

@@ -1,4 +1,4 @@
-package EEGLoader;
+package EEGDataLoading;
 
 import java.util.ArrayList;
 import java.util.HashMap;

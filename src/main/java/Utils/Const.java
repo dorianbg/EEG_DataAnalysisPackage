@@ -5,6 +5,9 @@ import org.apache.hadoop.fs.FileSystem;
 
 import java.awt.Font;
 
+/**
+ * @author Dorian Beganovic
+ */
 public class Const {
 
     public static final String VHDR_EXTENSION = ".vhdr";

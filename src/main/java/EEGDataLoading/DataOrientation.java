@@ -1,4 +1,4 @@
-package EEGLoader;
+package EEGDataLoading;
 
 /**
  * Created by stebjan on 10.8.2015.

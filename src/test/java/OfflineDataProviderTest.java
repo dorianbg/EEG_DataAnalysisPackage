@@ -1,5 +1,6 @@
-import OffLineDataProvider.OffLineDataProvider;
-import OffLineDataProvider.Utils;
+import DataTransformation.DataProviderUtils;
+import DataTransformation.OffLineDataProvider;
+
 import org.junit.Test;
 
 import java.util.List;
@@ -14,6 +15,7 @@ public class OfflineDataProviderTest {
             String[] files = {"/user/digitalAssistanceSystem/data/numbers/infoTrain.txt"};
             OffLineDataProvider odp =
                     new OffLineDataProvider(files);
+            odp.loadData();
             List<double[][]> epochs = odp.getTrainingData();
             List<Double> targets = odp.getTrainingDataLabels();
             System.out.println("loaded " + epochs.size() + " epochs, each with size " + epochs.get(0).length + "x" + epochs.get(0)[0].length );
@@ -23,7 +25,7 @@ public class OfflineDataProviderTest {
             assert epochs.get(0).length == 3;
             assert epochs.get(0)[0].length == 750;
 
-            Utils.writeEpochsToCSV(epochs);
+            DataProviderUtils.writeEpochsToCSV(epochs);
 
             double sum = 0;
             for (double[][] epoch : epochs){
@@ -52,6 +54,7 @@ public class OfflineDataProviderTest {
             String[] files = {"data/numbers/Stankov/Stankov_26_1_20145_27.eeg","4"};
             OffLineDataProvider odp =
                     new OffLineDataProvider(files);
+            odp.loadData();
             List<double[][]> epochs = odp.getTrainingData();
             List<Double> targets = odp.getTrainingDataLabels();
             System.out.println("loaded " + epochs.size() + " epochs, each with size " + epochs.get(0).length + "x" + epochs.get(0)[0].length );
