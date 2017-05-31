@@ -1,6 +1,4 @@
-import org.junit.runner.JUnitCore;
-import org.junit.runner.Result;
-import org.junit.runner.notification.Failure;
+package cz.zcu.kiv.Utils;
 
 /***********************************************************************************************************************
  *
@@ -26,17 +24,35 @@ import org.junit.runner.notification.Failure;
  * Baseline, 2017/05/25 22:05 Dorian Beganovic
  *
  **********************************************************************************************************************/
+public class Baseline {
 
-public class TestRunner {
-    public static void main(String[] args) {
-        Result result = JUnitCore.runClasses(HadoopLoadingTest.class);
-        for (Failure failure : result.getFailures()) {
-            System.out.println(failure.toString());
-        }
-        Result result2 = JUnitCore.runClasses(OfflineDataProviderTest.class);
-        for (Failure failure : result2.getFailures()) {
-            System.out.println(failure.toString());
+    public static void correct(float[] epoch, int prefix) {
+
+        float baseline = 0;
+
+        for (int i = 0; i < prefix; i++) {
+            baseline += epoch[i];
         }
 
+        baseline = baseline / prefix;
+
+        for (int i = 0; i < epoch.length; i++) {
+            epoch[i] -= baseline;
+        }
+    }
+
+    public static void correct(double[] epoch, int prefix) {
+
+        double baseline = 0;
+
+        for (int i = 0; i < prefix; i++) {
+            baseline += epoch[i];
+        }
+
+        baseline /= prefix;
+
+        for (int i = 0; i < epoch.length; i++) {
+            epoch[i] -= baseline;
+        }
     }
 }

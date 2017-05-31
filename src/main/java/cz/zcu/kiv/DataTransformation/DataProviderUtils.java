@@ -1,6 +1,6 @@
-import org.junit.runner.JUnitCore;
-import org.junit.runner.Result;
-import org.junit.runner.notification.Failure;
+package cz.zcu.kiv.DataTransformation;
+
+import java.util.List;
 
 /***********************************************************************************************************************
  *
@@ -23,20 +23,39 @@ import org.junit.runner.notification.Failure;
  *
  ***********************************************************************************************************************
  *
- * Baseline, 2017/05/25 22:05 Dorian Beganovic
+ * DataProviderUtils, 2017/05/25 22:05 Dorian Beganovic
  *
  **********************************************************************************************************************/
+public class DataProviderUtils {
+    public static void writeEpochsToCSV(List<double[][]> epochs) throws Exception {
 
-public class TestRunner {
-    public static void main(String[] args) {
-        Result result = JUnitCore.runClasses(HadoopLoadingTest.class);
-        for (Failure failure : result.getFailures()) {
-            System.out.println(failure.toString());
-        }
-        Result result2 = JUnitCore.runClasses(OfflineDataProviderTest.class);
-        for (Failure failure : result2.getFailures()) {
-            System.out.println(failure.toString());
+        //create a File class object and give the file the name employees.csv
+        java.io.File file = new java.io.File("Epochs.csv");
+
+        //Create a Printwriter text output stream and link it to the CSV File
+        java.io.PrintWriter outfile = new java.io.PrintWriter(file);
+
+        //Iterate the elements actually being used
+        for (double[][] epoch : epochs) {
+            for (int i = 0; i < epoch[2].length; i++) {
+                outfile.write(epoch[2][i] + ",");
+            }
+            outfile.write("\n");
         }
 
+        outfile.close();
     }
+
+    public static float[] toFloatArray(double[] arr) {
+        if (arr == null) {
+            return null;
+        }
+        int n = arr.length;
+        float[] ret = new float[n];
+        for (int i = 0; i < n; i++) {
+            ret[i] = (float) arr[i];
+        }
+        return ret;
+    }
+
 }

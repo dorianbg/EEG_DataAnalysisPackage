@@ -1,6 +1,6 @@
-import EEGDataLoading.DataTransformer;
-import EEGDataLoading.EEGDataTransformer;
-import Utils.Const;
+import cz.zcu.kiv.signal.DataTransformer;
+import cz.zcu.kiv.signal.EEGDataTransformer;
+import cz.zcu.kiv.Utils.Const;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkConf;
@@ -12,9 +12,30 @@ import java.net.URI;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 
-/**
- * @author Dorian Beganovic
- */
+/***********************************************************************************************************************
+ *
+ * This file is part of the Spark_EEG_Analysis project
+
+ * ==========================================
+ *
+ * Copyright (C) 2017 by University of West Bohemia (http://www.zcu.cz/en/)
+ *
+ ***********************************************************************************************************************
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ ***********************************************************************************************************************
+ *
+ * Baseline, 2017/05/25 22:05 Dorian Beganovic
+ *
+ **********************************************************************************************************************/
 public class HadoopLoadingTest {
 
     @Test

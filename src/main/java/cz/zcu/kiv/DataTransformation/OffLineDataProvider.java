@@ -1,11 +1,9 @@
-package DataTransformation;
+package cz.zcu.kiv.DataTransformation;
 
-import EEGDataLoading.ChannelInfo;
-import EEGDataLoading.DataTransformer;
-import EEGDataLoading.EEGDataTransformer;
-import EEGDataLoading.EEGMarker;
-import Utils.Baseline;
-import Utils.Const;
+import cz.zcu.kiv.signal.*;
+import cz.zcu.kiv.Utils.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
@@ -16,9 +14,31 @@ import java.net.URI;
 import java.nio.ByteOrder;
 import java.util.*;
 
-/**
- * @author Dorian Beganovic
- */
+/***********************************************************************************************************************
+ *
+ * This file is part of the Spark_EEG_Analysis project
+
+ * ==========================================
+ *
+ * Copyright (C) 2017 by University of West Bohemia (http://www.zcu.cz/en/)
+ *
+ ***********************************************************************************************************************
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ ***********************************************************************************************************************
+ *
+ * OffLineDataProvider, 2017/05/25 22:05 Dorian Beganovic
+ *
+ **********************************************************************************************************************/
+
 public class OffLineDataProvider {
 
     //
@@ -37,8 +57,12 @@ public class OffLineDataProvider {
     private List<Double> targets = new ArrayList<>();
     private int numberOfTargets = 0;
     private int numberOfNonTargets = 0;
+    private int epochsCounter = 0;
     //
     private String filePrefix = "";
+    //
+    private static Log logger = LogFactory.getLog(OffLineDataProvider.class);
+
 
     private String[] args;
     /**
@@ -53,15 +77,23 @@ public class OffLineDataProvider {
      */
     public OffLineDataProvider(String[] args) throws Exception {
         this.args = args;
+        logger.info("Started OffLineDataProvider with arguments" + args);
     }
 
+    /**
+     * loads the data by doing two things:
+     * 1. parsing the input format (.txt vs .eeg)
+     * 2. processing each of the files parsed from input
+     */
     public void loadData()  {
         try {
             this.fs = FileSystem.get(URI.create(Const.HDFS_URI), Const.HDFS_CONF);
+            logger.info("Parsing the input...");
             handleInput(args);
+            logger.info("Processing files...");
             processEEGFiles();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.fatal(e.getMessage());
         }
     }
 
@@ -81,18 +113,21 @@ public class OffLineDataProvider {
             throw new IllegalArgumentException(
                     "Please enter the input in one of these formats: " +
                             "1. <location of info.txt file> " +
-                            "2. <location of a .eeg file> <target number>  *<optional values>");
+                            "2. <location of a .eeg file> <guessed number>  *<optional values>");
         }
         else {
             String fileLocation = args[0];
             // .EEG
             if (fileLocation.substring(fileLocation.length() - 4).equals(".eeg")){ // in this case we have a .eeg file
+                logger.info("Input file is .eeg file with location " + fileLocation);
                 filePrefix = Const.HadoopUserPrefixFolder;
+                logger.info("This prefix will be added to the file" + filePrefix);
                 files.put(fileLocation,Integer.parseInt(args[1]));
             }
             // .TXT
             else if(fileLocation.substring(fileLocation.length() - 4).equals(".txt")){
                 filePrefix = Const.HadoopUserPrefixFolder + Const.Data_folder;
+                logger.info("This prefix will be added to the file" + filePrefix);
                 loadFilesFromInfoTxt(fileLocation);
             }
             // DIRECTORY
@@ -104,7 +139,6 @@ public class OffLineDataProvider {
             }
         }
     }
-
 
     /**
      * helper function which processes the EEGFiles after
@@ -118,25 +152,26 @@ public class OffLineDataProvider {
                 setFileNames(filePrefix + fileEntry.getKey());
             }
             catch (IOException e){
-                throw new IllegalArgumentException("the folder you inputted does not exist");
+                throw new IllegalArgumentException("The folder you inputted does not exist");
             }
             catch (IllegalArgumentException e){
-                System.out.println("Did not load the file " + fileEntry.getKey() + " because of this error: ");
-                System.out.println(e.getMessage());
+                logger.error("Did not load the file " + fileEntry.getKey() + " because of this error: ");
+                logger.error(e.getMessage());
                 continue;
             }
-            /*
-            System.out.println(vhdrFile);
-            System.out.println(vmrkFile);
-            System.out.println(eegFile);
-            */
+            logger.info("Processing file " + fileEntry.getKey());
+            logger.info("Loaded .eeg file:" + eegFile);
+            logger.info("Loaded .vdhr file:" + vhdrFile);
+            logger.info("Loaded .vmrk file:" + vmrkFile);
 
             DataTransformer dt = new EEGDataTransformer();
             List<ChannelInfo> channels = dt.getChannelInfo(vhdrFile);
+
+            logger.debug("Extracting channels");
+
             for (ChannelInfo channel : channels) {
 
-                // System.out.println(channel.getName() + " " + channel.getUnits());
-
+                logger.debug("Channel " + channel.getName() + " " + channel.getUnits());
                 if ("fz".equals(channel.getName().toLowerCase())) {
                     FZIndex = channel.getNumber();
                 } else if ("cz".equals(channel.getName().toLowerCase())) {
@@ -152,11 +187,11 @@ public class OffLineDataProvider {
             double[] czChannel = dt.readBinaryData(vhdrFile, eegFile, CZIndex, order);
             double[] pzChannel = dt.readBinaryData(vhdrFile, eegFile, PZIndex, order);
 
-            /*
-            System.out.println(fzChannel.length);
-            System.out.println(czChannel.length);
-            System.out.println(pzChannel.length);
-            */
+
+            logger.debug("Extracted fzChannel length" + fzChannel.length);
+            logger.debug("Extracted czChannel length" + czChannel.length);
+            logger.debug("Extracted pzChannel length" + pzChannel.length);
+
 
             List<EEGMarker> markers = dt.readMarkerList(vmrkFile);
             //Collections.shuffle(markers);
@@ -164,16 +199,20 @@ public class OffLineDataProvider {
             // store all epochs in a single list
             for (EEGMarker marker : markers) {
 
+                logger.debug("Using marker " + marker.getName());
                 // initiate the epoch object
                 EpochHolder epoch = new EpochHolder();
 
                 // 1. set the stimulus index
                 String stimulusNumber = marker.getStimulus().replaceAll("[\\D]", "");
+
+
                 int stimulusIndex = -1;
                 if (stimulusNumber.length() > 0) {
                     stimulusIndex = Integer.parseInt(stimulusNumber) - 1;
                 }
                 epoch.setStimulusIndex(stimulusIndex);
+                logger.debug("Set the  stimulus index (" + stimulusNumber + ") of epoch");
 
 
                 try {
@@ -193,26 +232,35 @@ public class OffLineDataProvider {
                     epoch.setCZ(fczChannel, 100);
                     epoch.setPZ(fpzChannel, 100);
 
+                    logger.debug("Set the ffz, fcz and fpz channels of epoch");
 
                     // 3. try to set the target value ???
-                    //System.out.println(epoch.getStimulusIndex());
                     if (epoch.getStimulusIndex() + 1 == fileEntry.getValue()) {
-    //                            System.out.println(em.getStimulusIndex());
                         epoch.setTarget(true);
                     }
+
+                    logger.debug("Set the target label of epoch");
+
+                    epochsCounter++;
+                    logger.debug("Epoch " + epochsCounter + " has been processed");
+
                     // 1 = target, 3 = non-target
                     if (epoch.isTarget() && numberOfTargets <= numberOfNonTargets) {
+                        logger.debug("Epoch is a positive target and numberOfTargets <= numberOfNonTargets");
+                        logger.debug("Training data increased \n");
                         this.epochs.add(epoch.getEpoch());
                         this.targets.add(1.0);
                         this.numberOfTargets++;
                     } else if (!epoch.isTarget() && numberOfTargets >= numberOfNonTargets) {
+                        logger.debug("Epoch isn't target and numberOfTargets >= numberOfNonTargets");
+                        logger.debug("Training data increased \n");
                         this.epochs.add(epoch.getEpoch());
                         this.targets.add(0.0);
                         this.numberOfNonTargets++;
                     }
 
                 } catch (ArrayIndexOutOfBoundsException ex) {
-                    ex.printStackTrace();
+                    logger.error("Array index out of bounds, skipping this epoch");
                 }
             }
         }
@@ -233,15 +281,14 @@ public class OffLineDataProvider {
      * @throws IOException in case the .txt or one of specified .eeg file does not exist
      */
     private void loadFilesFromInfoTxt(String fileLocation) throws IOException {
+        logger.info("Reading file from info.txt file");
         // init a new reader for hadoop hdfs
         BufferedReader br=new BufferedReader(new InputStreamReader(fs.open(new Path(fileLocation))));
-        //System.out.println(fileLocation);
         String line;
         int num;
         String fileLoc;
         // read all lines
         while ((line = br.readLine()) != null) {
-//            System.out.println(line);
             // if the line is empty, ignore it
             if (line.length() == 0){
                 continue;
@@ -258,6 +305,7 @@ public class OffLineDataProvider {
                     num = Integer.parseInt(parts[1]);
                     // store in the map
                     files.put(fileLoc, num);
+                    logger.info("Stored file " + fileLoc);
                 } catch (NumberFormatException ex) {
                     throw new IllegalArgumentException("Line " + line + " contains an improper number format");
                 }
