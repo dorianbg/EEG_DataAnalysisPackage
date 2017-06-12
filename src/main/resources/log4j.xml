@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ This file is part of the Java Class Comparator project (JaCC)
+  ~  http://www.assembla.com/spaces/jacc/
+  ~
+  ~  Copyright (c) 2008-2014 University of West Bohemia, Czech Republic.
+
+  ~ Cheatsheet: ALL < DEBUG < INFO < WARN < ERROR < FATAL < OFF.
+  -->
+
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd" >
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+    <!-- Two appenders are used - console and file -->
+
+    <appender name="detailedConsoleAppender" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{HH:mm:ss.SSS} %-3p [%c:%M:%L] - %m%n"/>
+        </layout>
+    </appender>
+
+    <appender name="detailedLogFileAppender" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="File" value="/tmp/logging.log"/>
+        <param name="Append" value="true"/>
+        <param name="DatePattern" value="'.'yyyy-MM-dd"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-6p [%c:%M:%L] - %m%n"/>
+        </layout>
+    </appender>
+
+    <!-- Limit mchange categories -->
+
+    <root>
+        <!-- log level -->
+        <level value="info"/>
+        <appender-ref ref="detailedConsoleAppender"/>
+        <appender-ref ref="detailedLogFileAppender"/>
+    </root>
+
+</log4j:configuration>
