@@ -12,6 +12,7 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.junit.Test;
 
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -76,12 +77,24 @@ public class FeatureExtractionTest {
             assert features.size() == 527;
             for (int i = 0; i < features.size(); i++){
                 assert features.get(i).length == 48;
+            }
 
-            }
-            // this can print out the contents
+
+            double allFeatures = 0;
+            double epochSum = 0;
+
             for (double[] epoch : features){
-                //System.out.println(Arrays.toString(epoch));
+                epochSum = 0;
+                for (double epoc : epoch){
+                    epochSum += epoc;
+                }
+                //System.out.println(epochSum);
+                allFeatures += epochSum;
             }
+            //System.out.println("Sum of all features" + allFeatures);
+            assert epochSum == 4.477696312014916;
+            assert allFeatures == -299.9964225116246;
+
         }
         catch (Exception e){
             e.printStackTrace();

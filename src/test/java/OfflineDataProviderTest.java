@@ -5,6 +5,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 
+import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.List;
 
 /***********************************************************************************************************************
@@ -49,24 +51,31 @@ public class OfflineDataProviderTest {
             assert epochs.size() == 527;
             assert epochs.get(0).length == 3;
             assert epochs.get(0)[0].length == 750;
-
             DataProviderUtils.writeEpochsToCSV(epochs);
 
-            double sum = 0;
+            PrintWriter file = new PrintWriter("/Users/dorianbeganovic/Desktop/sparkFE.txt");
+            double epochsSum = 0;
             for (double[][] epoch : epochs){
                 for (int i = 0; i < epoch.length; i++){
+                    double rowSum = 0;
                     for (int j = 0; j < epoch[i].length; j++){
-                        sum += epoch[i][j];
+                        rowSum += epoch[i][j];
+                        //logger.info("Row epochsSum is" + rowSum);
                     }
+                    file.println(rowSum);
+                    //System.out.println(rowSum);
+                    epochsSum += rowSum;
                 }
             }
-            logger.info("Sum of epochs is" + sum);
+            logger.info("Sum of epochs is" + epochsSum);
+            assert epochsSum == (-1.1528369024642944E7);
 
             int targetsSum = 0;
             for (double target : targets){
                 targetsSum += target;
             }
             logger.info("Sum of targets is" + targetsSum);
+            assert targetsSum==263;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -93,9 +102,13 @@ public class OfflineDataProviderTest {
             double sum = 0;
             for (double[][] epoch : epochs){
                 for (int i = 0; i < epoch.length; i++){
+                    double rowSum = 0;
                     for (int j = 0; j < epoch[i].length; j++){
-                        sum += epoch[i][j];
+                        rowSum += epoch[i][j];
+                        System.out.println(rowSum);
+                        logger.info("Row sum is" + rowSum);
                     }
+                    sum += rowSum;
                 }
             }
             logger.info("Sum of epochs is" + sum);

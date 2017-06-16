@@ -50,7 +50,7 @@ public class OffLineDataProvider {
     private int CZIndex;
     private int PZIndex;
     //
-    private Map<String, Integer> files = new HashMap<>();
+    private Map<String, Integer> files = new LinkedHashMap<>();
     private FileSystem fs;
     //
     private List<double[][]> epochs = new ArrayList<>();
@@ -77,7 +77,7 @@ public class OffLineDataProvider {
      */
     public OffLineDataProvider(String[] args) throws Exception {
         this.args = args;
-        logger.info("Started OffLineDataProvider with arguments" + args);
+        logger.info("Started OffLineDataProvider with arguments" + Arrays.toString(args));
     }
 
     /**
