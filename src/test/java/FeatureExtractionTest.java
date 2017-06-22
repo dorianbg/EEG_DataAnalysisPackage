@@ -1,4 +1,5 @@
 import cz.zcu.kiv.DataTransformation.OffLineDataProvider;
+import cz.zcu.kiv.FeatureExtraction.IFeatureExtraction;
 import cz.zcu.kiv.FeatureExtraction.WaveletTransform;
 import cz.zcu.kiv.Utils.SignalProcessing;
 import cz.zcu.kiv.Utils.SparkInitializer;
@@ -8,6 +9,9 @@ import cz.zcu.kiv.eegdsp.main.SignalProcessingFactory;
 import cz.zcu.kiv.eegdsp.wavelet.discrete.WaveletResultDiscrete;
 import cz.zcu.kiv.eegdsp.wavelet.discrete.WaveletTransformationDiscrete;
 import cz.zcu.kiv.eegdsp.wavelet.discrete.algorithm.wavelets.WaveletDWT;
+import org.apache.commons.el.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.junit.Test;
@@ -42,6 +46,8 @@ import java.util.List;
  **********************************************************************************************************************/
 public class FeatureExtractionTest {
 
+    private static Log logger = LogFactory.getLog(FeatureExtractionTest.class);
+
     /*
     we will do a wavelet transform with following specifications:
         - 512 ms interval starting 175 ms after the beginning of each epoch is used
@@ -49,10 +55,10 @@ public class FeatureExtractionTest {
         - based on the results, 16 approximation coefficients of level 5 were used from each EEG channel
         - finally, all three results of DVVT were concatenated to form a feature vector of dimension 48.
     */
-    private static Function<double[][], double[]> mapFunc=new Function<double[][], double[]>() {
+    private static Function<double[][], double[]> mapFunc = new Function<double[][], double[]>() {
         public double[] call(double[][] epoch) {
-            WaveletTransform waveletTransformer = new WaveletTransform(8, 512,175,16);
-            return waveletTransformer.extractFeatures(epoch);
+            IFeatureExtraction fe = new WaveletTransform(8, 512,175,16);
+            return fe.extractFeatures(epoch);
         }
     };
 
@@ -71,7 +77,7 @@ public class FeatureExtractionTest {
             // a naive and ugly collect
             List<double[]> features = epochs.map(mapFunc).collect();
 
-            System.out.println("Dimensions of resulting epochs are: " + features.size() + " x " + features.get(0).length);
+            logger.info("Dimensions of resulting epochs are: " + features.size() + " x " + features.get(0).length);
 
             //tests
             assert features.size() == 527;

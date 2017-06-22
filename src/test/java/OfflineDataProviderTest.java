@@ -53,17 +53,13 @@ public class OfflineDataProviderTest {
             assert epochs.get(0)[0].length == 750;
             DataProviderUtils.writeEpochsToCSV(epochs);
 
-            PrintWriter file = new PrintWriter("/Users/dorianbeganovic/Desktop/sparkFE.txt");
             double epochsSum = 0;
             for (double[][] epoch : epochs){
                 for (int i = 0; i < epoch.length; i++){
                     double rowSum = 0;
                     for (int j = 0; j < epoch[i].length; j++){
                         rowSum += epoch[i][j];
-                        //logger.info("Row epochsSum is" + rowSum);
                     }
-                    file.println(rowSum);
-                    //System.out.println(rowSum);
                     epochsSum += rowSum;
                 }
             }
@@ -105,8 +101,6 @@ public class OfflineDataProviderTest {
                     double rowSum = 0;
                     for (int j = 0; j < epoch[i].length; j++){
                         rowSum += epoch[i][j];
-                        System.out.println(rowSum);
-                        logger.info("Row sum is" + rowSum);
                     }
                     sum += rowSum;
                 }

@@ -8,6 +8,8 @@ import cz.zcu.kiv.eegdsp.main.SignalProcessingFactory;
 import cz.zcu.kiv.eegdsp.wavelet.discrete.WaveletResultDiscrete;
 import cz.zcu.kiv.eegdsp.wavelet.discrete.WaveletTransformationDiscrete;
 import cz.zcu.kiv.eegdsp.wavelet.discrete.algorithm.wavelets.WaveletDWT;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.spark.api.java.function.Function;
 
 
@@ -36,6 +38,7 @@ import org.apache.spark.api.java.function.Function;
  *
  **********************************************************************************************************************/
 public class WaveletTransform implements IFeatureExtraction {
+    private static Log logger = LogFactory.getLog(WaveletTransform.class);
 
     private static final long serialVersionUID = 7526472295622776147L;
     /**
@@ -113,8 +116,7 @@ public class WaveletTransform implements IFeatureExtraction {
             wavelet = ((WaveletTransformationDiscrete) dwt)
                     .getWaveletGenerator().getWaveletByName(names[NAME]);
         } catch (Exception e) {
-            System.out
-                    .println("Exception loading wavelet " + names[NAME] + ".");
+            logger.info("Exception loading wavelet " + names[NAME] + ".");
         }
         ((WaveletTransformationDiscrete) dwt).setWavelet(wavelet);
 

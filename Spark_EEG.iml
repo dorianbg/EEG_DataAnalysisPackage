@@ -11,7 +11,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: cz.zcu.kiv:eegloader-hdfs:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.spark:spark-core_2.10:1.6.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.avro:avro-mapred:hadoop2:1.7.7" level="project" />
     <orderEntry type="library" name="Maven: org.apache.avro:avro-ipc:1.7.7" level="project" />
@@ -80,6 +79,34 @@
     <orderEntry type="library" name="Maven: net.razorvine:pyrolite:4.9" level="project" />
     <orderEntry type="library" name="Maven: net.sf.py4j:py4j:0.9" level="project" />
     <orderEntry type="library" name="Maven: org.spark-project.spark:unused:1.0.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.spark:spark-mllib_2.10:1.6.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.spark:spark-streaming_2.10:1.6.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.spark:spark-sql_2.10:1.6.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.spark:spark-catalyst_2.10:1.6.2" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.janino:janino:2.7.8" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.janino:commons-compiler:2.7.8" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.parquet:parquet-column:1.7.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.parquet:parquet-common:1.7.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.parquet:parquet-encoding:1.7.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.parquet:parquet-generator:1.7.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.parquet:parquet-hadoop:1.7.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.parquet:parquet-format:2.3.0-incubating" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.parquet:parquet-jackson:1.7.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.spark:spark-graphx_2.10:1.6.2" level="project" />
+    <orderEntry type="library" name="Maven: com.github.fommil.netlib:core:1.1.2" level="project" />
+    <orderEntry type="library" name="Maven: net.sourceforge.f2j:arpack_combined_all:0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.scalanlp:breeze_2.10:0.11.2" level="project" />
+    <orderEntry type="library" name="Maven: org.scalanlp:breeze-macros_2.10:0.11.2" level="project" />
+    <orderEntry type="library" name="Maven: org.scalamacros:quasiquotes_2.10:2.0.0-M8" level="project" />
+    <orderEntry type="library" name="Maven: net.sf.opencsv:opencsv:2.3" level="project" />
+    <orderEntry type="library" name="Maven: com.github.rwl:jtransforms:2.4.0" level="project" />
+    <orderEntry type="library" name="Maven: org.spire-math:spire_2.10:0.7.4" level="project" />
+    <orderEntry type="library" name="Maven: org.spire-math:spire-macros_2.10:0.7.4" level="project" />
+    <orderEntry type="library" name="Maven: org.jpmml:pmml-model:1.1.15" level="project" />
+    <orderEntry type="library" name="Maven: org.jpmml:pmml-agent:1.1.15" level="project" />
+    <orderEntry type="library" name="Maven: org.jpmml:pmml-schema:1.1.15" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.xml.bind:jaxb-impl:2.2.7" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.xml.bind:jaxb-core:2.2.7" level="project" />
     <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-common:2.6.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-annotations:2.6.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:guava:11.0.2" level="project" />
@@ -94,10 +121,6 @@
     <orderEntry type="library" name="Maven: org.mortbay.jetty:jetty-util:6.1.26" level="project" />
     <orderEntry type="library" name="Maven: com.sun.jersey:jersey-json:1.9" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.jettison:jettison:1.1" level="project" />
-    <orderEntry type="library" name="Maven: com.sun.xml.bind:jaxb-impl:2.2.3-1" level="project" />
-    <orderEntry type="library" name="Maven: javax.xml.bind:jaxb-api:2.2.2" level="project" />
-    <orderEntry type="library" name="Maven: javax.xml.stream:stax-api:1.0-2" level="project" />
-    <orderEntry type="library" name="Maven: javax.activation:activation:1.1" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-jaxrs:1.8.3" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-xc:1.8.3" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: tomcat:jasper-compiler:5.5.23" level="project" />
@@ -141,6 +164,9 @@
     <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-yarn-api:2.6.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-mapreduce-client-core:2.6.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-yarn-common:2.6.0" level="project" />
+    <orderEntry type="library" name="Maven: javax.xml.bind:jaxb-api:2.2.2" level="project" />
+    <orderEntry type="library" name="Maven: javax.xml.stream:stax-api:1.0-2" level="project" />
+    <orderEntry type="library" name="Maven: javax.activation:activation:1.1" level="project" />
     <orderEntry type="library" name="Maven: com.sun.jersey:jersey-client:1.9" level="project" />
     <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-mapreduce-client-jobclient:2.6.0" level="project" />
     <orderEntry type="library" name="Maven: cz.zcu.kiv:eegdsp:1.0" level="project" />

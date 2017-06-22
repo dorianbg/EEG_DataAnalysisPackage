@@ -1,10 +1,8 @@
 package cz.zcu.kiv.Utils;
 
-import com.esotericsoftware.kryo.Kryo;
-import cz.zcu.kiv.FeatureExtraction.WaveletTransform;
 import org.apache.spark.SparkConf;
+import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.serializer.KryoRegistrator;
 
 /***********************************************************************************************************************
  *
@@ -33,17 +31,28 @@ import org.apache.spark.serializer.KryoRegistrator;
 public class SparkInitializer {
 
     private static JavaSparkContext javaSparkContext = null;
+    private static SparkContext sparkContext = null;
 
     private SparkInitializer(){
         // Exists only to defeat instantiation.
     }
 
+    public static SparkContext getSparkContext() {
+        if (sparkContext == null) {
+            sparkContext = new SparkContext(new SparkConf().
+                    setAppName("Guess the number").
+                    setMaster("local[*]").
+                    set("spark.driver.allowMultipleContexts", "true")
+            );
+        }
+        return sparkContext;
+    }
+
     public static JavaSparkContext getJavaSparkContext() {
         if (javaSparkContext == null) {
-            javaSparkContext = new JavaSparkContext(new SparkConf().
-                    setAppName("Guess the number").
-                    setMaster("local[*]"));
+            javaSparkContext = new JavaSparkContext(getSparkContext());
         }
         return javaSparkContext;
     }
+
 }
