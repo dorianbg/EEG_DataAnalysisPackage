@@ -1,4 +1,7 @@
+import cz.zcu.kiv.Classification.GradientBoostedTreesClassifier;
 import cz.zcu.kiv.Classification.LogisticRegressionClassifier;
+import cz.zcu.kiv.Classification.RandomForestClassifier;
+import cz.zcu.kiv.Classification.SVMClassifier;
 import cz.zcu.kiv.DataTransformation.OffLineDataProvider;
 import cz.zcu.kiv.FeatureExtraction.IFeatureExtraction;
 import cz.zcu.kiv.FeatureExtraction.WaveletTransform;
@@ -7,7 +10,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -85,4 +87,140 @@ public class ClassifierTest {
             e.printStackTrace();
         }
     }
+
+    @Test
+    public void test2() {
+        try {
+            String[] files = {"/user/digitalAssistanceSystem/data/numbers/infoTrain.txt"};
+            OffLineDataProvider odp =
+                    new OffLineDataProvider(files);
+            odp.loadData();
+            List<double[][]> rawEpochs = odp.getTrainingData();
+            List<Double> rawTargets = odp.getTrainingDataLabels();
+            IFeatureExtraction fe = new WaveletTransform(8, 512, 175, 16);
+            SVMClassifier svmClassifier = new SVMClassifier();
+
+            // total data
+            List<double[][]> data = odp.getTrainingData();
+            List<Double> targets = odp.getTrainingDataLabels();
+
+            // shuffle the data but use the same seed !
+            long seed = 1;
+            Collections.shuffle(data,new Random(seed));
+            Collections.shuffle(targets,new Random(seed));
+
+            // training data
+            List<double[][]> trainEpochs = data.subList(0,(int)(data.size()*0.7));
+            List<Double> trainTargets = targets.subList(0,(int)(targets.size()*0.7));
+
+            // testing data
+            List<double[][]> testEpochs = data.subList((int)(data.size()*0.7),data.size());
+            List<Double> testTargets = targets.subList((int)(targets.size()*0.7),targets.size());
+
+            // train
+            svmClassifier.train(trainEpochs, trainTargets, fe);
+
+            //test
+            ClassificationStatistics classificationStatistics = svmClassifier.test(testEpochs,testTargets);
+
+            // analyze the results
+            logger.info("Classification statistics\n" + classificationStatistics);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    @Test
+    public void test3() {
+        try {
+            String[] files = {"/user/digitalAssistanceSystem/data/numbers/infoTrain.txt"};
+            OffLineDataProvider odp =
+                    new OffLineDataProvider(files);
+            odp.loadData();
+            List<double[][]> rawEpochs = odp.getTrainingData();
+            List<Double> rawTargets = odp.getTrainingDataLabels();
+            IFeatureExtraction fe = new WaveletTransform(8, 512, 175, 16);
+            RandomForestClassifier randomForestClassifier = new RandomForestClassifier();
+
+            // total data
+            List<double[][]> data = odp.getTrainingData();
+            List<Double> targets = odp.getTrainingDataLabels();
+
+            // shuffle the data but use the same seed !
+            long seed = 1;
+            Collections.shuffle(data,new Random(seed));
+            Collections.shuffle(targets,new Random(seed));
+
+            // training data
+            List<double[][]> trainEpochs = data.subList(0,(int)(data.size()*0.7));
+            List<Double> trainTargets = targets.subList(0,(int)(targets.size()*0.7));
+
+            // testing data
+            List<double[][]> testEpochs = data.subList((int)(data.size()*0.7),data.size());
+            List<Double> testTargets = targets.subList((int)(targets.size()*0.7),targets.size());
+
+            // train
+            randomForestClassifier.train(trainEpochs, trainTargets, fe);
+
+            //test
+            ClassificationStatistics classificationStatistics = randomForestClassifier.test(testEpochs,testTargets);
+
+            // analyze the results
+            logger.info("Classification statistics\n" + classificationStatistics);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Test
+    public void test4() {
+        try {
+            String[] files = {"/user/digitalAssistanceSystem/data/numbers/infoTrain.txt"};
+            OffLineDataProvider odp =
+                    new OffLineDataProvider(files);
+            odp.loadData();
+            List<double[][]> rawEpochs = odp.getTrainingData();
+            List<Double> rawTargets = odp.getTrainingDataLabels();
+            IFeatureExtraction fe = new WaveletTransform(8, 512, 175, 16);
+            GradientBoostedTreesClassifier gradientBoostedTreesClassifier = new GradientBoostedTreesClassifier();
+
+            // total data
+            List<double[][]> data = odp.getTrainingData();
+            List<Double> targets = odp.getTrainingDataLabels();
+
+            // shuffle the data but use the same seed !
+            long seed = 1;
+            Collections.shuffle(data,new Random(seed));
+            Collections.shuffle(targets,new Random(seed));
+
+            // training data
+            List<double[][]> trainEpochs = data.subList(0,(int)(data.size()*0.7));
+            List<Double> trainTargets = targets.subList(0,(int)(targets.size()*0.7));
+
+            // testing data
+            List<double[][]> testEpochs = data.subList((int)(data.size()*0.7),data.size());
+            List<Double> testTargets = targets.subList((int)(targets.size()*0.7),targets.size());
+
+            // train
+            gradientBoostedTreesClassifier.train(trainEpochs, trainTargets, fe);
+
+            //test
+            ClassificationStatistics classificationStatistics = gradientBoostedTreesClassifier.test(testEpochs,testTargets);
+
+            // analyze the results
+            logger.info("Classification statistics\n" + classificationStatistics);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
