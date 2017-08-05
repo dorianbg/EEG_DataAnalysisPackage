@@ -78,6 +78,7 @@ The Machine learning classifier implementation can be found in the Classificatio
 This library was develop in a modular mannder so that different components could be placed together to make the whole pipeline.
 The options the user has for specifying the workflow are the following: 
  
+
  0. Id (REQUIRED - the id of the job)  
  - id = {some_integer}*
  
@@ -90,22 +91,22 @@ The options the user has for specifying the workflow are the following:
  - fe = {dwt-8} 
  
  3. Classification  
- - a) (REQUIRED - choose whether to train or load a classifier)  
+ - a) (REQUIRED - choose whether to train or load a classifier)    
  	train_clf = {svm,dt,logreg,rf}   
  			OR  
  	load_clf={svm,dt,logreg,rf} AND load_name={src/main/resources/Classifiers/(*name*) }  
  		
- - b) (OPTIONAL - choose whether to save the classifier and give him a name)
- 	save_clf={true,false} 
- 		AND 
- 	save_name={*name}   
+ - b) (OPTIONAL - choose whether to save the classifier and give him a name)  
+ 	save_clf={true,false}   
+ 		AND  
+ 	save_name={*name}     
  
  - c) (REQUIRED - the specific configuration for each classifier)  
  	config_*clf_param*
  	-> can't be condensed as it's very specific for each classifier 
  
  4. Saving the results (REQUIRED - choose where to save the classifier performance)  
- - result_path={*path_to_file}    
+ - result_path={*path_to_file}     
 
 
 The configuration must be passed in a special format of query parameters, ie.
