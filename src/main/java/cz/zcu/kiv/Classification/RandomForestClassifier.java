@@ -3,6 +3,7 @@ package cz.zcu.kiv.Classification;
 import cz.zcu.kiv.FeatureExtraction.IFeatureExtraction;
 import cz.zcu.kiv.Utils.ClassificationStatistics;
 import cz.zcu.kiv.Utils.SparkInitializer;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -13,11 +14,17 @@ import org.apache.spark.mllib.classification.SVMWithSGD;
 import org.apache.spark.mllib.evaluation.MulticlassMetrics;
 import org.apache.spark.mllib.linalg.DenseVector;
 import org.apache.spark.mllib.regression.LabeledPoint;
+import org.apache.spark.mllib.tree.DecisionTree;
 import org.apache.spark.mllib.tree.RandomForest;
 import org.apache.spark.mllib.tree.configuration.Strategy;
+import org.apache.spark.mllib.tree.impurity.Entropy;
+import org.apache.spark.mllib.tree.impurity.Gini;
 import org.apache.spark.mllib.tree.model.RandomForestModel;
 import scala.Tuple2;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 /***********************************************************************************************************************
@@ -47,8 +54,9 @@ import java.util.List;
 public class RandomForestClassifier implements IClassifier {
 
     private static Log logger = LogFactory.getLog(RandomForestClassifier.class);
-    private static IFeatureExtraction fe;
-    private static RandomForestModel model;
+    public static IFeatureExtraction fe;
+    static RandomForestModel model;
+    private HashMap<String,String> config;
 
     private static Function<double[][], double[]> featureExtractionFunc = new Function<double[][], double[]>() {
         public double[] call(double[][] epoch) {
@@ -90,12 +98,41 @@ public class RandomForestClassifier implements IClassifier {
 
         // Run training algorithm to build the model.
         Strategy strategy = Strategy.defaultStrategy("Classification");
-        Integer numTrees = 100;
-        String featureSubsetStrategy = "auto";
+        Integer numTrees;
+        String featureSubsetStrategy;
         Integer seed = 12345;
 
-        RandomForestClassifier.model = new RandomForest(strategy,numTrees,featureSubsetStrategy,seed)
-                .run(training.rdd());
+        if(     config.containsKey("config_max_bins")
+                && config.containsKey("config_impurity")
+                && config.containsKey("config_max_depth")
+                && config.containsKey("config_min_instances_per_node")
+                && config.containsKey("config_feature_subset")
+                && config.containsKey("config_num_trees")){
+
+            logger.info("Creating the model with configuration");
+            // Run training algorithm to build the model.
+            // the parameters
+            if(config.get("config_impurity").equals("gini")){
+                strategy.setImpurity(Gini.instance());
+            }
+            else{
+                strategy.setImpurity(Entropy.instance());
+            }
+            strategy.setMaxBins(Integer.parseInt(config.get("config_max_bins")));
+            strategy.setMaxDepth(Integer.parseInt(config.get("config_max_depth")));
+            strategy.setMinInstancesPerNode(Integer.parseInt(config.get("config_min_instances_per_node")));
+
+            numTrees = Integer.parseInt(config.get("config_num_trees"));
+            featureSubsetStrategy = config.get("config_feature_subset");
+
+            RandomForestClassifier.model = new RandomForest(strategy,numTrees,featureSubsetStrategy,seed).run(training.rdd());
+        }
+        else {
+            numTrees = 100;
+            featureSubsetStrategy = "auto";
+            logger.info("Creating the model without configuration");
+            RandomForestClassifier.model = new RandomForest(strategy,numTrees,featureSubsetStrategy,seed).run(training.rdd());
+        }
     }
 
     @Override
@@ -126,6 +163,11 @@ public class RandomForestClassifier implements IClassifier {
 
     @Override
     public void save(String file) {
+        try {
+            FileUtils.deleteDirectory(new File(file));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         model.save(SparkInitializer.getSparkContext(),file);
     }
 
@@ -137,6 +179,11 @@ public class RandomForestClassifier implements IClassifier {
     @Override
     public IFeatureExtraction getFeatureExtraction() {
         return fe;
+    }
+
+    @Override
+    public void setConfig(HashMap<String, String> config) {
+        this.config = config;
     }
 
 }

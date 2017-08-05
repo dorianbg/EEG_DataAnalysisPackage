@@ -5,6 +5,7 @@ import cz.zcu.kiv.Utils.ClassificationStatistics;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.List;
 
 /***********************************************************************************************************************
@@ -77,4 +78,8 @@ public interface IClassifier {
      */
     IFeatureExtraction getFeatureExtraction();
 
+    /**
+     * Sets the configuration of a classifier
+     */
+    void setConfig(HashMap<String,String> config);
 }

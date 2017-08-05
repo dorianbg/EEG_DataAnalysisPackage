@@ -3,19 +3,22 @@ package cz.zcu.kiv.Classification;
 import cz.zcu.kiv.FeatureExtraction.IFeatureExtraction;
 import cz.zcu.kiv.Utils.ClassificationStatistics;
 import cz.zcu.kiv.Utils.SparkInitializer;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
-import org.apache.spark.mllib.classification.LogisticRegressionModel;
-import org.apache.spark.mllib.classification.LogisticRegressionWithLBFGS;
+import org.apache.spark.mllib.classification.*;
 import org.apache.spark.mllib.evaluation.MulticlassMetrics;
 import org.apache.spark.mllib.linalg.DenseVector;
 import org.apache.spark.mllib.regression.LabeledPoint;
 import scala.Tuple2;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /***********************************************************************************************************************
@@ -46,6 +49,7 @@ public class LogisticRegressionClassifier implements IClassifier{
     private static Log logger = LogFactory.getLog(LogisticRegressionClassifier.class);
     private static IFeatureExtraction fe;
     private static LogisticRegressionModel model;
+    private HashMap<String,String> config = new HashMap<>(5);
 
 
     private static Function<double[][], double[]> featureExtractionFunc = new Function<double[][], double[]>() {
@@ -88,10 +92,25 @@ public class LogisticRegressionClassifier implements IClassifier{
 
         JavaRDD<LabeledPoint> training = rawData.map(unPackFunction);
 
-        // Run training algorithm to build the model.
-        LogisticRegressionClassifier.model = new LogisticRegressionWithLBFGS()
-                .setNumClasses(2)
-                .run(training.rdd());
+
+
+        if(config.containsKey("config_num_iterations")
+                && config.containsKey("config_step_size")
+                && config.containsKey("config_mini_batch_fraction")){
+
+            logger.info("Creating the model with configuration");
+            // Run training algorithm to build the model.
+            LogisticRegressionClassifier.model = new LogisticRegressionWithSGD().train(
+                    training.rdd(),
+                    Integer.parseInt(config.get("config_num_iterations")),
+                    Double.parseDouble(config.get("config_step_size")),
+                    Double.parseDouble(config.get("config_mini_batch_fraction")));
+        }
+        else {
+            logger.info("Creating the model without configuration");
+            LogisticRegressionClassifier.model = new LogisticRegressionWithSGD().run(training.rdd());
+        }
+
     }
 
     @Override
@@ -122,6 +141,11 @@ public class LogisticRegressionClassifier implements IClassifier{
 
     @Override
     public void save(String file) {
+        try {
+            FileUtils.deleteDirectory(new File(file));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         model.save(SparkInitializer.getSparkContext(),file);
     }
 
@@ -133,5 +157,10 @@ public class LogisticRegressionClassifier implements IClassifier{
     @Override
     public IFeatureExtraction getFeatureExtraction() {
         return fe;
+    }
+
+    @Override
+    public void setConfig(HashMap<String, String> config) {
+        this.config = config;
     }
 }

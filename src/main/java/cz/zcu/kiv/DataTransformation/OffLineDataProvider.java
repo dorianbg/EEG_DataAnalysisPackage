@@ -363,14 +363,14 @@ public class OffLineDataProvider {
     /**
      * @return epochs for training
      */
-    public List<double[][]> getTrainingData() {
+    public List<double[][]> getData() {
         return this.epochs;
     }
 
     /**
      * @return data labels
      */
-    public List<Double> getTrainingDataLabels(){
+    public List<Double> getDataLabels(){
         return this.targets;
     }
 }

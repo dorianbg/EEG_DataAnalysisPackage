@@ -3,6 +3,7 @@ package cz.zcu.kiv.Classification;
 import cz.zcu.kiv.FeatureExtraction.IFeatureExtraction;
 import cz.zcu.kiv.Utils.ClassificationStatistics;
 import cz.zcu.kiv.Utils.SparkInitializer;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -11,16 +12,21 @@ import org.apache.spark.api.java.function.Function;
 import org.apache.spark.mllib.evaluation.MulticlassMetrics;
 import org.apache.spark.mllib.linalg.DenseVector;
 import org.apache.spark.mllib.regression.LabeledPoint;
-import org.apache.spark.mllib.tree.GradientBoostedTrees;
-import org.apache.spark.mllib.tree.configuration.BoostingStrategy;
-import org.apache.spark.mllib.tree.model.GradientBoostedTreesModel;
+import org.apache.spark.mllib.tree.DecisionTree;
+import org.apache.spark.mllib.tree.configuration.Strategy;
+import org.apache.spark.mllib.tree.impurity.Entropy;
+import org.apache.spark.mllib.tree.impurity.Gini;
+import org.apache.spark.mllib.tree.model.DecisionTreeModel;
 import scala.Tuple2;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 /***********************************************************************************************************************
  *
- * This file is part of the Spark_EEG_Analysis project
+ * This file is part of the EEG_Analysis project
 
  * ==========================================
  *
@@ -39,13 +45,15 @@ import java.util.List;
  *
  ***********************************************************************************************************************
  *
- * GradientBoostedTreesClassifier, 2017/06/27 20:03 Dorian Beganovic
+ * DecisionTreeClassifier, 2017/08/03 16:54 dbg
  *
  **********************************************************************************************************************/
-public class GradientBoostedTreesClassifier implements IClassifier{
-    private static Log logger = LogFactory.getLog(GradientBoostedTreesClassifier.class);
+public class DecisionTreeClassifier implements IClassifier {
+
+    private static Log logger = LogFactory.getLog(DecisionTreeClassifier.class);
     private static IFeatureExtraction fe;
-    private static GradientBoostedTreesModel model;
+    private static DecisionTreeModel model;
+    private HashMap<String,String> config;
 
     private static Function<double[][], double[]> featureExtractionFunc = new Function<double[][], double[]>() {
         public double[] call(double[][] epoch) {
@@ -70,12 +78,12 @@ public class GradientBoostedTreesClassifier implements IClassifier{
 
     @Override
     public void setFeatureExtraction(IFeatureExtraction fe) {
-        GradientBoostedTreesClassifier.fe = fe;
+        DecisionTreeClassifier.fe = fe;
     }
 
     @Override
     public void train(List<double[][]> epochs, List<Double> targets, IFeatureExtraction fe) {
-        GradientBoostedTreesClassifier.fe = fe;
+        DecisionTreeClassifier.fe = fe;
         JavaRDD<double[][]> rddEpochs = SparkInitializer.getJavaSparkContext().parallelize(epochs);
         JavaRDD<Double> rddTargets = SparkInitializer.getJavaSparkContext().parallelize(targets);
 
@@ -86,11 +94,37 @@ public class GradientBoostedTreesClassifier implements IClassifier{
         JavaRDD<LabeledPoint> training = rawData.map(unPackFunction);
 
         // Run training algorithm to build the model.
-        BoostingStrategy strategy = BoostingStrategy.defaultParams("Classification");
-        strategy.setNumIterations(300);
+        // the other parameters
 
-        GradientBoostedTreesClassifier.model = new GradientBoostedTrees(strategy)
-                .run(training.rdd());
+        Strategy strategy = Strategy.defaultStrategy("Classification");
+        strategy.setNumClasses(2);
+
+
+        if(     config.containsKey("config_max_bins")
+                && config.containsKey("config_impurity")
+                && config.containsKey("config_max_depth")
+                && config.containsKey("config_min_instances_per_node")){
+
+            logger.info("Creating the model with configuration");
+            // Run training algorithm to build the model.
+            // the parameters
+            if(config.get("config_impurity").equals("gini")){
+                strategy.setImpurity(Gini.instance());
+            }
+            else{
+                strategy.setImpurity(Entropy.instance());
+            }
+            strategy.setMaxBins(Integer.parseInt(config.get("config_max_bins")));
+            strategy.setMaxDepth(Integer.parseInt(config.get("config_max_depth")));
+            strategy.setMinInstancesPerNode(Integer.parseInt(config.get("config_min_instances_per_node")));
+
+
+            DecisionTreeClassifier.model = new DecisionTree(strategy).run(training.rdd());
+        }
+        else {
+            logger.info("Creating the model without configuration");
+            DecisionTreeClassifier.model = new DecisionTree(strategy).run(training.rdd());
+        }
     }
 
     @Override
@@ -121,17 +155,27 @@ public class GradientBoostedTreesClassifier implements IClassifier{
 
     @Override
     public void save(String file) {
+        try {
+            FileUtils.deleteDirectory(new File(file));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         model.save(SparkInitializer.getSparkContext(),file);
     }
 
     @Override
     public void load(String file) {
-        model = GradientBoostedTreesModel.load(SparkInitializer.getSparkContext(),file);
+        model = DecisionTreeModel.load(SparkInitializer.getSparkContext(),file);
     }
 
     @Override
     public IFeatureExtraction getFeatureExtraction() {
         return fe;
+    }
+
+    @Override
+    public void setConfig(HashMap<String, String> config) {
+        this.config = config;
     }
 
 }

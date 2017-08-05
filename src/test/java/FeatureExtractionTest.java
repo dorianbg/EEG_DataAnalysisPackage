@@ -1,23 +1,13 @@
 import cz.zcu.kiv.DataTransformation.OffLineDataProvider;
 import cz.zcu.kiv.FeatureExtraction.IFeatureExtraction;
 import cz.zcu.kiv.FeatureExtraction.WaveletTransform;
-import cz.zcu.kiv.Utils.SignalProcessing;
 import cz.zcu.kiv.Utils.SparkInitializer;
-import cz.zcu.kiv.eegdsp.common.ISignalProcessingResult;
-import cz.zcu.kiv.eegdsp.common.ISignalProcessor;
-import cz.zcu.kiv.eegdsp.main.SignalProcessingFactory;
-import cz.zcu.kiv.eegdsp.wavelet.discrete.WaveletResultDiscrete;
-import cz.zcu.kiv.eegdsp.wavelet.discrete.WaveletTransformationDiscrete;
-import cz.zcu.kiv.eegdsp.wavelet.discrete.algorithm.wavelets.WaveletDWT;
-import org.apache.commons.el.Logger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.junit.Test;
 
-import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.List;
 
 /***********************************************************************************************************************
@@ -69,8 +59,8 @@ public class FeatureExtractionTest {
             OffLineDataProvider odp =
                     new OffLineDataProvider(files);
             odp.loadData();
-            List<double[][]> rawEpochs = odp.getTrainingData();
-            List<Double> rawTargets = odp.getTrainingDataLabels();
+            List<double[][]> rawEpochs = odp.getData();
+            List<Double> rawTargets = odp.getDataLabels();
             JavaRDD<double[][]> epochs = SparkInitializer.getJavaSparkContext().parallelize(rawEpochs);
             JavaRDD<Double> targets = SparkInitializer.getJavaSparkContext().parallelize(rawTargets);
 

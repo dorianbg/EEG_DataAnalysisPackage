@@ -3,11 +3,13 @@ package cz.zcu.kiv.Classification;
 import cz.zcu.kiv.FeatureExtraction.IFeatureExtraction;
 import cz.zcu.kiv.Utils.ClassificationStatistics;
 import cz.zcu.kiv.Utils.SparkInitializer;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.mllib.classification.LogisticRegressionWithSGD;
 import org.apache.spark.mllib.classification.SVMModel;
 import org.apache.spark.mllib.classification.SVMWithSGD;
 import org.apache.spark.mllib.evaluation.MulticlassMetrics;
@@ -15,6 +17,9 @@ import org.apache.spark.mllib.linalg.DenseVector;
 import org.apache.spark.mllib.regression.LabeledPoint;
 import scala.Tuple2;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 /***********************************************************************************************************************
@@ -46,6 +51,7 @@ public class SVMClassifier implements IClassifier {
     private static Log logger = LogFactory.getLog(SVMClassifier.class);
     private static IFeatureExtraction fe;
     private static SVMModel model;
+    private HashMap<String,String> config;
 
     private static Function<double[][], double[]> featureExtractionFunc = new Function<double[][], double[]>() {
         public double[] call(double[][] epoch) {
@@ -85,9 +91,23 @@ public class SVMClassifier implements IClassifier {
 
         JavaRDD<LabeledPoint> training = rawData.map(unPackFunction);
 
-        // Run training algorithm to build the model.
-        SVMClassifier.model = new SVMWithSGD()
-                .run(training.rdd());
+        // Run training algorithm to build the model
+        if(config.containsKey("config_num_iterations") && config.containsKey("config_step_size") &&
+        config.containsKey("config_reg_param") && config.containsKey("config_mini_batch_fraction")){
+
+            logger.info("Creating the model with configuration");
+            SVMClassifier.model = new SVMWithSGD().train(
+                    training.rdd(),
+                    Integer.parseInt(config.get("config_num_iterations")),
+                    Double.parseDouble(config.get("config_step_size")),
+                    Double.parseDouble(config.get("config_reg_param")),
+                    Double.parseDouble(config.get("config_mini_batch_fraction"))
+            );
+        }
+        else {
+            logger.info("Creating the model without configuration");
+            SVMClassifier.model = new SVMWithSGD().run(training.rdd());
+        }
     }
 
     @Override
@@ -118,6 +138,11 @@ public class SVMClassifier implements IClassifier {
 
     @Override
     public void save(String file) {
+        try {
+            FileUtils.deleteDirectory(new File(file));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         model.save(SparkInitializer.getSparkContext(),file);
     }
 
@@ -131,4 +156,8 @@ public class SVMClassifier implements IClassifier {
         return fe;
     }
 
+    @Override
+    public void setConfig(HashMap<String, String> config) {
+        this.config = config;
+    }
 }

@@ -5,8 +5,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 
-import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.List;
 
 /***********************************************************************************************************************
@@ -43,8 +41,8 @@ public class OfflineDataProviderTest {
             OffLineDataProvider odp =
                     new OffLineDataProvider(files);
             odp.loadData();
-            List<double[][]> epochs = odp.getTrainingData();
-            List<Double> targets = odp.getTrainingDataLabels();
+            List<double[][]> epochs = odp.getData();
+            List<Double> targets = odp.getDataLabels();
             logger.info("loaded " + epochs.size() + " epochs, each with size " + epochs.get(0).length + "x" + epochs.get(0)[0].length );
             logger.info("loaded " + targets.size() + " labels");
 
@@ -85,8 +83,8 @@ public class OfflineDataProviderTest {
             OffLineDataProvider odp =
                     new OffLineDataProvider(files);
             odp.loadData();
-            List<double[][]> epochs = odp.getTrainingData();
-            List<Double> targets = odp.getTrainingDataLabels();
+            List<double[][]> epochs = odp.getData();
+            List<Double> targets = odp.getDataLabels();
 
             logger.info("loaded " + epochs.size() + " epochs, each with size " + epochs.get(0).length + "x" + epochs.get(0)[0].length );
             logger.info("loaded " + targets.size() + " labels");

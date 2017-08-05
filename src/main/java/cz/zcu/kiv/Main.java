@@ -1,6 +1,10 @@
 package cz.zcu.kiv;
 
 
+import cz.zcu.kiv.Pipeline.PipelineBuilder;
+
+import java.util.Arrays;
+
 /***********************************************************************************************************************
  *
  * This file is part of the Spark_EEG_Analysis project
@@ -27,5 +31,15 @@ package cz.zcu.kiv;
  **********************************************************************************************************************/
 public class Main {
     public static void main(String[] args) {
+        //System.out.println("args are " + Arrays.toString(args));
+        PipelineBuilder pipelineBuilder = new PipelineBuilder(args[0]);
+
+
+        try {
+            pipelineBuilder.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }
