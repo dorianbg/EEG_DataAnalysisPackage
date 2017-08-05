@@ -101,8 +101,7 @@ public class WaveletTransform implements IFeatureExtraction {
      * Method that creates a wavelet by a name using SignalProcessingFactory and
      * processes the signal
      *
-     * @param epoch
-     *            - source epochs
+     * @param epoch - source epochs
      * @return - normalized feature vector with only approximation coefficients
      */
     @Override

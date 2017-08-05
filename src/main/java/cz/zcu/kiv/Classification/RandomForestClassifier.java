@@ -133,6 +133,8 @@ public class RandomForestClassifier implements IClassifier {
             logger.info("Creating the model without configuration");
             RandomForestClassifier.model = new RandomForest(strategy,numTrees,featureSubsetStrategy,seed).run(training.rdd());
         }
+
+
     }
 
     @Override
