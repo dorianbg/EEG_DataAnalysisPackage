@@ -70,6 +70,7 @@ public class LogisticRegressionClassifier implements IClassifier{
     private static Function<LabeledPoint, Tuple2<Object, Object>> classifyFunction = new Function<LabeledPoint, Tuple2<Object, Object>>() {
         public Tuple2<Object, Object> call(LabeledPoint p) {
             Double prediction = model.predict(p.features());
+            logger.info("Prediction is " + prediction);
             return new Tuple2<Object, Object>(prediction, p.label());
         }
     };

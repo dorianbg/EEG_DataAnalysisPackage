@@ -2,6 +2,8 @@ package cz.zcu.kiv;
 
 
 import cz.zcu.kiv.Pipeline.PipelineBuilder;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.Arrays;
 
@@ -30,8 +32,14 @@ import java.util.Arrays;
  *
  **********************************************************************************************************************/
 public class Main {
+
+    private static Log logger = LogFactory.getLog(Main.class);
+
     public static void main(String[] args) {
-        //System.out.println("args are " + Arrays.toString(args));
+
+
+        logger.info("args are " + Arrays.toString(args));
+        logger.info("args length" + args.length);
         PipelineBuilder pipelineBuilder = new PipelineBuilder(args[0]);
 
 

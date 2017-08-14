@@ -1,4 +1,5 @@
 import cz.zcu.kiv.Classification.LogisticRegressionClassifier;
+import cz.zcu.kiv.Classification.NeuralNetworkClassifier;
 import cz.zcu.kiv.Classification.RandomForestClassifier;
 import cz.zcu.kiv.Classification.SVMClassifier;
 import cz.zcu.kiv.DataTransformation.OffLineDataProvider;

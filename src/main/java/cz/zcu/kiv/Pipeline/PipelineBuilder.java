@@ -7,7 +7,6 @@ import cz.zcu.kiv.FeatureExtraction.WaveletTransform;
 import cz.zcu.kiv.Utils.ClassificationStatistics;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -54,7 +53,15 @@ public class PipelineBuilder {
         for (String param : params)
         {
             String name = param.split("=")[0];
-            String value = param.split("=")[1];
+            //String value = param.split("=")[1];
+            String value;
+            // in case the value of a parameter is empty -> but ideally this should not happen
+            try {
+                 value = param.split("=")[1];
+            } catch (ArrayIndexOutOfBoundsException e){
+                value = "";
+            }
+
             map.put(name, value);
         }
         return map;
@@ -86,7 +93,6 @@ public class PipelineBuilder {
      */
     public void execute() throws Exception {
         Map<String,String> queryMap = getQueryMap(query);
-        System.setProperty("logfilename", System.getProperty("user.home") + "/spark_server/logs/" + queryMap.get("id") );
         logger.info(queryMap);
         String[] files = new String[5];
 
@@ -154,6 +160,8 @@ public class PipelineBuilder {
                 case "dt": classifier = new DecisionTreeClassifier();
                     break;
                 case "rf" : classifier = new RandomForestClassifier();
+                    break;
+                case "nn" : classifier = new NeuralNetworkClassifier();
                     break;
                 default: classifier = null;
                     throw new IllegalArgumentException("Unsupported classifier argument");
@@ -237,6 +245,8 @@ public class PipelineBuilder {
                     break;
                 case "rf" : classifier = new RandomForestClassifier();
                     break;
+                case "nn" : classifier = new NeuralNetworkClassifier();
+                    break;
                 default: classifier = null;
                     throw new IllegalArgumentException("Unsupported classifier argument");
             }
@@ -258,7 +268,7 @@ public class PipelineBuilder {
             classifier.setFeatureExtraction(fe);
             classifier.load(System.getProperty("user.home") + "/spark_server/classifiers/" + classifierPath);
 
-            logger.info("Loaded the classifier classifier");
+            logger.info("Loaded the classifier");
 
             //test
             classificationStatistics = classifier.test(data,targets);
