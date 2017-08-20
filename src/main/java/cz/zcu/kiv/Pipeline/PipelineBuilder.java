@@ -206,7 +206,7 @@ public class PipelineBuilder {
                 if(queryMap.get("save_clf").equals("true")){
                     logger.info("Saving classifier");
                     if(queryMap.containsKey("save_name")){
-                        classifier.save(System.getProperty("user.home") + "/spark_server/classifiers/" + queryMap.get("save_name"));
+                        classifier.save(queryMap.get("save_name"));
                     }
                     else{
                         throw new IllegalArgumentException("Please provide a location to save a classifier within the  save_location query parameter");

@@ -1,9 +1,10 @@
-# Spark_EEG_Analysis
+# EEG_Analysis
 
 ### Intro
 
 This is a project focused providing capabilities for analyzing EEG data stored on the Hadoop Filesystem (HDFS)
 using the Apache Spark library
+
 
 ### Data sources
 
@@ -65,10 +66,11 @@ Various classifiers were implemented, each implementing the crucial IClassifier 
 
 
 The various implementations are: 
-- Decision Tree Classifier  
 - Logistic Regression Classifier  
-- Random Forest Classifier  
 - Support Vector Machine Classifier  
+- Decision Tree Classifier  
+- Random Forest Classifier  
+- Neural Network Classifier  
 
 The Machine learning classifier implementation can be found in the Classification package  
 
@@ -126,7 +128,62 @@ config_feature_subset=auto&
 config_impurity=gini&  
 result_path=/Users/dorianbeganovic/spark_server/results/1000329970.txt  
  
+ ### Specific per-classifier configuration options
+ 
+ 1. Logistic Regression Classifier  
+ - config_step_size -> default=1.0
+ - config_num_iterations ->  default=100
+ - config_mini_batch_fraction ->  default = 1.0
+ 
+  2. Support Vector Machine Classifier  
+ - config_step_size -> default=1.0
+ - config_num_iterations ->  default=100
+ - config_mini_batch_fraction ->  default = 1.0
+ - config_reg_param -> default = 0.01
+ 
+ 3. Decision Tree Classifier  
+ - config_max_depth -> default=5
+ - config_max_bins ->  default=32
+ - config_min_instances_per_node ->  default = 1
+ - config_impurity -> default = gini ; options={gini,entropy}
+ 
+ 4. Random Forest Classifier  
+  - config_max_depth -> default=5
+  - config_max_bins ->  default=32
+  - config_min_instances_per_node ->  default = 1
+  - config_impurity -> default = gini ; options={gini,entropy}
+  - config_feature_subset -> default=auto ; options={auto,all,sqrt,log2} 
+  - config_num_trees -> default=100 
+ 
+ 5. Neural Network Classifier  
+ 
+    General classifier options  
+     
+ - config_seed -> default=12345
+ - config_num_iterations -> default = 1000
+ - config_learning_rate -> default = 0.1
+ - config_momentum -> default = 0.5
+ - config_weight_init -> default = xavier, options = {xavier, zero, sigmoid, uniform, relu}
+ - config_updater -> default = nesterovs, options = {sgd, adam, nesterovs, adagrad, rmsprop} 
+        (Good information: https://deeplearning4j.org/updater)
+ - config_optimization_algo -> default = conjugate_gradient,  options = {line_gradient_descent, lbfgs, conjugate_gradient, stochastic_gradient_descent}  
+ - config_loss_function -> default = xent, options = { mse, xent, squared_loss , negativeloglikelihood}
+ - config_pretrain -> default = false
+ - config_backprop -> default = true
+ 
+     Per layer classifier options  
+
+- config_layer(i)_layer_type -> default = output, options = {"output", "dense", "auto_encoder", "rbm", "graves_lstm"}
+- config_layer(i)_drop_out -> default = 0.-
+- config_layer(i)_activation_function -> default = sigmoid, options = {"sigmoid", "softmax", "relu", "tanh", "identity", "softplus", "elu"}
+- config_layer(i)_n_out -> default = 2 
+
+If you have trouble understanding what abbreviations like "sgd" mean, 
+I suggest googleing with a query like "dl4j sgd neural network meaning" 
+ 
+ 
  ### Build process
+ 
  
  The application uses Apache Maven for dependency management and packaging.
  
@@ -138,7 +195,10 @@ result_path=/Users/dorianbeganovic/spark_server/results/1000329970.txt
 
 ### Deployment
 
-There are two common methods in which you can use this application:
+The project is compatible with Spark 1.6.2 version as well as Apache Hadoop 2.6.0
+
+
+There are two common ways in which you can use this application:
 
 1) Development on local machine
     - you need to have Hadoop file system running on your machine

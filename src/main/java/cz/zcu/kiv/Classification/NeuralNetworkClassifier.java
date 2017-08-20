@@ -254,7 +254,6 @@ public class NeuralNetworkClassifier implements IClassifier {
         switch (command){
             case "mse" : return LossFunctions.LossFunction.MSE;
             case "xent" : return LossFunctions.LossFunction.XENT;
-
             case "squared_loss" : return LossFunctions.LossFunction.SQUARED_LOSS;
             case "negativeloglikelihood" : return LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD;
             default: return LossFunctions.LossFunction.MSE;

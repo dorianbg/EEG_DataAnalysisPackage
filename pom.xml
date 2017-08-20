@@ -43,7 +43,14 @@
 
         </plugins>
     </build>
+
+
     <dependencies>
+        <dependency>
+            <groupId>org.nd4j</groupId>
+            <artifactId>nd4j-native-platform</artifactId>
+            <version>0.8.0</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.10</artifactId>
@@ -94,6 +101,12 @@
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
         </dependency>
+        <dependency>
+            <groupId>org.deeplearning4j</groupId>
+            <artifactId>deeplearning4j-core</artifactId>
+            <version>0.8.0</version>
+        </dependency>
+
     </dependencies>
     <repositories>
         <repository>
