@@ -143,12 +143,12 @@ public class SVMClassifier implements IClassifier {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        model.save(SparkInitializer.getSparkContext(),file);
+        model.save(SparkInitializer.getSparkContext(),"file://"+file);
     }
 
     @Override
     public void load(String file) {
-        model = SVMModel.load(SparkInitializer.getSparkContext(),file);
+        model = SVMModel.load(SparkInitializer.getSparkContext(),"file://"+file);
     }
 
     @Override

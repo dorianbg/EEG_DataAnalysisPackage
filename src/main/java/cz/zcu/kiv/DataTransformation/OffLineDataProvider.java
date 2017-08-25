@@ -120,13 +120,13 @@ public class OffLineDataProvider {
             // .EEG
             if (fileLocation.substring(fileLocation.length() - 4).equals(".eeg")){ // in this case we have a .eeg file
                 logger.info("Input file is .eeg file with location " + fileLocation);
-                filePrefix = Const.HadoopUserPrefixFolder;
+                filePrefix = "";
                 logger.info("This prefix will be added to the file" + filePrefix);
                 files.put(fileLocation,Integer.parseInt(args[1]));
             }
             // .TXT
             else if(fileLocation.substring(fileLocation.length() - 4).equals(".txt")){
-                filePrefix = Const.HadoopUserPrefixFolder + Const.Data_folder;
+                filePrefix = fileLocation.substring(0,fileLocation.lastIndexOf("/")) + "/";
                 logger.info("This prefix will be added to the file" + filePrefix);
                 loadFilesFromInfoTxt(fileLocation);
             }

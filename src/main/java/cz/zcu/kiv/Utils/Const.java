@@ -39,8 +39,8 @@ public class Const {
     public static final Configuration HDFS_CONF = new Configuration();
 
     ///--- this might be a good idea to explore
-    public static final String HadoopUserPrefixFolder = "/user/digitalAssistanceSystem/";
-    public static final String Data_folder = "/data/numbers/";
+//    public static final String HadoopUserPrefixFolder = "/user/digitalAssistanceSystem/";
+ //   public static final String Data_folder = "/data/numbers/";
 
     //-------------------------MLP classifier------------------------
     public static final int DEFAULT_OUTPUT_NEURONS = 1; /* number of output neurons */
