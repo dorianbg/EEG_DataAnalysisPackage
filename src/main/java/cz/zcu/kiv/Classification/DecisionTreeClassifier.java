@@ -154,13 +154,9 @@ public class DecisionTreeClassifier implements IClassifier {
     }
 
     @Override
-    public void save(String file) {
-        try {
-            FileUtils.deleteDirectory(new File(file));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        model.save(SparkInitializer.getSparkContext(),"file://"+file);
+    public void save(String file) throws IOException {
+        FileUtils.deleteDirectory(new File(file));
+        model.save(SparkInitializer.getSparkContext(),"file://" + file);
     }
 
     @Override

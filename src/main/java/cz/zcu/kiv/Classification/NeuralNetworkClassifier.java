@@ -3,6 +3,7 @@ package cz.zcu.kiv.Classification;
 import com.twelvemonkeys.util.LinkedSet;
 import cz.zcu.kiv.FeatureExtraction.IFeatureExtraction;
 import cz.zcu.kiv.Utils.ClassificationStatistics;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
@@ -20,7 +21,9 @@ import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -119,31 +122,7 @@ public class NeuralNetworkClassifier implements IClassifier {
             builder.layer(id-1, parseLayer(id,config.get("config_layer" + id + "_layer_type")));
         }
         logger.info("Number of layers " + numLayers);
-        /*
-        builder.layer(0, new DenseLayer.Builder().nIn(numFeatures).nOut(400)
-                .activation(Activation.RELU)
-                .build());
-        builder.layer(1, new AutoEncoder.Builder()
-                .nIn(400)
-                .nOut(200)
-                .dropOut(0.2)
-                .build());
-        builder.layer(2, new GravesLSTM.Builder()
-                .nIn(200)
-                .nOut(100)
-                .dropOut(0.2)
-                .build());
-        builder.layer(3, new RBM.Builder()
-                .nIn(100)
-                .nOut(10)
-                .activation(Activation.RELU)
-                .build());
-        builder.layer(4, new OutputLayer.Builder()
-                .nIn(10)
-                .nOut(numLabels)
-                .activation(Activation.SOFTMAX)// xent
-                .build());
-         */
+
         if(config.get("config_pretrain").equals("true")){
             builder.pretrain(true);
         }
@@ -162,36 +141,37 @@ public class NeuralNetworkClassifier implements IClassifier {
         model = new MultiLayerNetwork(conf); // Passing built configuration to instance of multilayer network
         model.init(); // Initialize mode
         //model.printConfiguration();
+        logger.info("Started training the classifier");
         model.fit(dataSet);
+        logger.info("Trained the classifier");
         //model.setListeners(new ScoreIterationListener(100));// Setting listeners
 
     }
 
     @Override
     public ClassificationStatistics test(List<double[][]> epochs, List<Double> targets) {
+        logger.info("Testing the classifier");
         ClassificationStatistics resultsStats = new ClassificationStatistics(); // initialization of classifier statistics
         logger.info(epochs.size());
         for (int i = 0; i < epochs.size(); i++) {   //iterating epochs
             logger.info(i);
             double[] featureVector = fe.extractFeatures(epochs.get(i)); // Extracting features to vector
             INDArray features = Nd4j.create(featureVector); // Creating INDArray with extracted features
-            logger.info("Extracted the features");
-            logger.info("Using the classifier");
+            logger.debug("Extracted the features");
+            logger.debug("Using the classifier");
             double output = model.output(features, org.deeplearning4j.nn.api.Layer.TrainingMode.TEST).getDouble(0); // Result of classifying
-            logger.info("Prediction is " + output);
+            logger.debug("Prediction is " + output);
             resultsStats.add(output, targets.get(i));   // calculating statistics
         }
+        logger.info("Done testing the classifier");
         return resultsStats;    //  returns classifier statistics
     }
 
     @Override
-    public void save(String file) {
-        try {
-            ModelSerializer.writeModel(model,file,false);
-            logger.info("Saved the classifier");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void save(String file) throws IOException{
+        new File(file).delete();
+        ModelSerializer.writeModel(model,file,false);
+        logger.info("Saved the classifier");
     }
 
     @Override
@@ -202,7 +182,7 @@ public class NeuralNetworkClassifier implements IClassifier {
                 logger.info("Loaded the classifier");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 

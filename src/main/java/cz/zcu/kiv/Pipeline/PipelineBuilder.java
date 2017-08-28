@@ -114,6 +114,7 @@ public class PipelineBuilder {
 
         OffLineDataProvider odp =
                 new OffLineDataProvider(files);
+
         odp.loadData();
         List<double[][]> rawEpochs = odp.getData();
         List<Double> rawTargets = odp.getDataLabels();
@@ -150,7 +151,7 @@ public class PipelineBuilder {
         if(queryMap.containsKey("train_clf")){
 
             String classifierType = queryMap.get("train_clf");
-            logger.info("Training a classifier of type " + classifierType);
+            logger.info("1. Training a classifier of type " + classifierType);
 
             switch (classifierType){
                 case "svm": classifier = new SVMClassifier();
@@ -166,9 +167,12 @@ public class PipelineBuilder {
                 default: classifier = null;
                     throw new IllegalArgumentException("Unsupported classifier argument");
             }
+            logger.info("2. Getting the required data");
             // total data
             List<double[][]> data = odp.getData();
             List<Double> targets = odp.getDataLabels();
+
+            logger.info("2. -> loaded the required data");
 
             // shuffle the data but use the same seed !
             long seed = 1;
@@ -182,6 +186,7 @@ public class PipelineBuilder {
             // testing data
             List<double[][]> testEpochs = data.subList((int)(data.size()*0.7),data.size());
             List<Double> testTargets = targets.subList((int)(targets.size()*0.7),targets.size());
+            logger.info("Loaded the data into memory");
 
             // Load config
             HashMap<String,String> config = new HashMap<>(10);
@@ -191,7 +196,6 @@ public class PipelineBuilder {
                 }
             }
 
-            logger.info("Loaded the data into memory");
             // into the classifier
             classifier.setConfig(config);
 
@@ -279,9 +283,8 @@ public class PipelineBuilder {
             throw new IllegalArgumentException("Missing classifier argument");
         }
 
+        logger.info(classificationStatistics);
 
-
-        System.out.println(classificationStatistics);
         if(queryMap.containsKey("result_path")){
             File file = new File(queryMap.get("result_path"));
             PrintWriter printWriter = new PrintWriter (file);

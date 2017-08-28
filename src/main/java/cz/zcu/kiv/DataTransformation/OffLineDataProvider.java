@@ -308,6 +308,8 @@ public class OffLineDataProvider {
                     logger.info("Stored file " + fileLoc);
                 } catch (NumberFormatException ex) {
                     throw new IllegalArgumentException("Line " + line + " contains an improper number format");
+                } finally {
+                    br.close();
                 }
             }
         }

@@ -3,6 +3,7 @@ package cz.zcu.kiv.Classification;
 import cz.zcu.kiv.FeatureExtraction.IFeatureExtraction;
 import cz.zcu.kiv.Utils.ClassificationStatistics;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
@@ -63,7 +64,7 @@ public interface IClassifier {
      * Save the classifier to a model
      * @param file location of the model on PC
      */
-    void save(String file);
+    void save(String file) throws IOException;
 
     /**
      *

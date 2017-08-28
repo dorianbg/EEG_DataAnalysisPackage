@@ -141,12 +141,8 @@ public class LogisticRegressionClassifier implements IClassifier{
     }
 
     @Override
-    public void save(String file) {
-        try {
-            FileUtils.deleteDirectory(new File(file));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void save(String file) throws IOException {
+        FileUtils.deleteDirectory(new File(file));
         model.save(SparkInitializer.getSparkContext(),"file://" + file);
     }
 
